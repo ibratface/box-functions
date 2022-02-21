@@ -2,8 +2,10 @@ import { Container } from '@mui/material';
 import AuthGuard from '../components/auth-guard';
 import Header from '../components/header';
 import FunctionList from '../components/function-list';
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { BoxContext } from '../components/context';
+import FunctionCreate from '../components/function-create';
+import { Box } from '@mui/system';
 
 export async function getStaticProps() {
   return {
@@ -21,6 +23,7 @@ export async function getStaticProps() {
 
 export default function Home({ boxConfig }) {
   const boxContext = useContext(BoxContext)
+  const [dateUpdated, setDateUpdated] = useState(Date.now())
 
   useEffect(() => {
     if (boxConfig) {
@@ -34,7 +37,10 @@ export default function Home({ boxConfig }) {
     <Container>
       <Header />
       <AuthGuard>
-        <FunctionList boxFolderId={boxContext.userFolderId}></FunctionList>
+        <Box>
+          <FunctionList boxFolderId={boxContext.userFolderId} dateUpdated={dateUpdated} setDateUpdated={setDateUpdated}></FunctionList>
+          <FunctionCreate setDateUpdated={setDateUpdated} />
+        </Box>
       </AuthGuard>
     </Container>
   )

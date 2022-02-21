@@ -2,7 +2,7 @@ import { Container } from "@mui/material";
 import { Fragment, useContext, useEffect, useState } from "react";
 import AuthGuard from "../../components/auth-guard";
 import FunctionCredentials from "../../components/function-credentials";
-import FunctionCode from "../../components/function-code";
+import FunctionSource from "../../components/function-source";
 import Header from "../../components/header";
 import VerticalTabs from "../../components/vertical-tabs";
 import FunctionBar from "../../components/function-bar";
@@ -12,25 +12,8 @@ import { UserAccount } from "../../lib/user-account";
 import { useRouter } from "next/router";
 import React from 'react';
 import FunctionTrigger from "../../components/function-trigger";
+import appConfig from "../../conf/app.config";
 
-
-const default_settings = `{
-  "boxAppSettings": {
-    "clientID": "abcdefghijklmnopqrstuvwxyz",
-    "clientSecret": "********************************",
-    "appAuth": {
-      "publicKeyID": "",
-      "privateKey": "",
-      "passphrase": ""
-    }
-  },
-  "enterpriseID": "123456789"
-}`
-
-const default_function = `export default function execute(context) {
-
-}
-`
 
 function findItem(items, name) {
   const matches = items.filter(i => i.name == name)
@@ -38,9 +21,9 @@ function findItem(items, name) {
 }
 
 
-function getOrCreateFile(folderItems, folderId, filename, account) {
+function getOrCreateFile(folderItems, folderId, filename, account, content) {
   let file = findItem(folderItems, filename)
-  file = file ? file : account.uploadFile(folderId, filename, default_settings)
+  file = file ? file : account.uploadFile(folderId, filename, content)
   return file
 }
 
@@ -52,8 +35,8 @@ export default function Function() {
   const { functionId } = router.query
 
   const [folder, setFolder] = useState(null)
-  const [settingsFile, setSettingsFile] = useState({ name: 'settings.json' })
-  const [codeFile, setCodeFile] = useState({ name: 'function.js' })
+  const [settingsFile, setSettingsFile] = useState({ name: appConfig.files.credentials.filename })
+  const [codeFile, setCodeFile] = useState({ name: appConfig.files.source.filename })
 
   const [output, setOutput] = useState()
   const [running, setRunning] = useState(false)
@@ -63,9 +46,9 @@ export default function Function() {
       const folder = await userAccount.getFunctionInfo(functionId)
       setFolder(folder)
       const folderItems = await userAccount.listFunctionFiles(folder.id)
-      setSettingsFile(getOrCreateFile(folderItems, folder.id, settingsFile.name, userAccount))
-      setCodeFile(getOrCreateFile(folderItems, folder.id, codeFile.name, userAccount))
-    }    
+      setSettingsFile(getOrCreateFile(folderItems, folder.id, settingsFile.name, userAccount, appConfig.files.credentials.filename))
+      setCodeFile(getOrCreateFile(folderItems, folder.id, codeFile.name, userAccount, appConfig.files.source.filename))
+    }
     if (functionId) loadFunction()
   }, [functionId])
 
@@ -78,10 +61,10 @@ export default function Function() {
             <Fragment>
               <FunctionBar folder={folder} setOutput={setOutput} running={running} setRunning={setRunning} />
               <VerticalTabs
-                tabs={['App Settings', 'Code', 'Triggers (WIP)', "Security (WIP)"]}
+                tabs={['App Credentials', 'Source', 'Triggers (WIP)', "Security (WIP)"]}
                 panels={[
                   <FunctionCredentials folder={folder} file={settingsFile} key="credentials" />,
-                  <FunctionCode folder={folder} file={codeFile} key="code" />,
+                  <FunctionSource folder={folder} file={codeFile} key="code" />,
                   <FunctionTrigger key="trigger" />,
                   "Look away! I'm not ready!"]} />
               <FunctionOutput output={output} running={running} />

@@ -1,11 +1,12 @@
 import BoxSDK from "box-node-sdk"
-import { getBoxAppServiceAccount, getBoxUserAccount } from "../../../lib/box-account"
+import { getBoxUserAccount } from "../../../lib/box-account"
 import vm from 'vm'
 import { Console } from 'console';
 import stream from 'stream';
+import appConfig from "../../../conf/app.config";
 
 
-function error(res, status = 404, e=null) {
+function error(res, status = 404, e = null) {
   res.status(status)
   if (e) res.send(e)
 }
@@ -57,14 +58,13 @@ function getAccessToken(req) {
 
 async function runFunction(id, action, req, res) {
   const boxAccount = getBoxUserAccount(getAccessToken(req))
-  // const boxAccount = getBoxAppServiceAccount()
 
   try {
     const result = await boxAccount._client.folders.getItems(id, { fields: 'id,name' })
-    const settingsFile = await downloadFile(boxAccount._client, result.entries, 'settings.json')
-    const sourceFile = await downloadFile(boxAccount._client, result.entries, 'function.js')
+    const credentialsFile = await downloadFile(boxAccount._client, result.entries, appConfig.files.credentials.filename)
+    const sourceFile = await downloadFile(boxAccount._client, result.entries, appConfig.files.source.filename)
 
-    const settings = JSON.parse(settingsFile)
+    const settings = JSON.parse(credentialsFile)
     const boxSdk = BoxSDK.getPreconfiguredInstance(settings)
     const box = boxSdk.getAppAuthClient('enterprise')
 
@@ -72,7 +72,7 @@ async function runFunction(id, action, req, res) {
       box,
       console: getConsole(res)
     }
-    const func = vm.runInNewContext(sourceFile + '; execute;', context, { timeout: 1000 })
+    const func = vm.runInNewContext(`async function _execute() { 'use strict'; ${sourceFile} }; _execute;`, context, { timeout: 1000 })
     await func(context)
     res.status(200).end()
   }
@@ -81,8 +81,6 @@ async function runFunction(id, action, req, res) {
     error(res, 400, `${e.name}: ${e.message}`)
   }
 }
-
-
 
 
 export default async function handler(req, res) {
