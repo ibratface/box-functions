@@ -14,7 +14,6 @@ function useBoxContext() {
 
   const [clientID, setClientID] = useCookieState('box_client_id', '/')
   const [clientSecret, setClientSecret] = useCookieState('box_client_secret', '/')
-  const [redirectURI, setRedirectURI] = useCookieState('box_redirect_uri', '/')
   const [serviceAccountID, setServiceAccountID] = useCookieState('box_service_account_id', '/')
 
   const [accessToken, setAccessToken] = useReducer((prev, next) => {
@@ -43,8 +42,6 @@ function useBoxContext() {
     setClientID,
     clientSecret,
     setClientSecret,
-    redirectURI,
-    setRedirectURI,
     serviceAccountID,
     setServiceAccountID,
     accessToken,

@@ -11,7 +11,6 @@ export async function getStaticProps() {
       boxConfig: {
         clientID: process.env.BOX_FRONTEND_CLIENT_ID,
         clientSecret: process.env.BOX_FRONTEND_CLIENT_SECRET,
-        redirectURI: process.env.BOX_FRONTEND_REDIRECT_URI,
         serviceAccountID: process.env.BOX_BACKEND_SERVICE_ACCOUNT_ID
       }
     }
@@ -27,7 +26,6 @@ export default function Home({ boxConfig }) {
     if (boxConfig) {
       boxContext.setClientID(boxConfig.clientID)
       boxContext.setClientSecret(boxConfig.clientSecret)
-      boxContext.setRedirectURI(boxConfig.redirectURI)
       boxContext.setServiceAccountID(boxConfig.serviceAccountID)
     }
   }, [boxConfig])

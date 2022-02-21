@@ -4,7 +4,6 @@ export default {
     "boxAppSettings": {
       "clientID": process.env.BOX_FRONTEND_CLIENT_ID,
       "clientSecret": process.env.BOX_FRONTEND_CLIENT_SECRET,
-      "redirectURI": process.env.BOX_FRONTEND_REDIRECT_URI
     },
   },
   "backend": {
