@@ -77,7 +77,7 @@ export default function Function() {
             <Fragment>
               <FunctionBar folder={folder} setOutput={setOutput} running={running} setRunning={setRunning} />
               <VerticalTabs
-                tabs={['App Settings', 'Code', 'Triggers', "Security"]}
+                tabs={['App Settings', 'Code', 'Triggers (WIP)', "Security (WIP)"]}
                 panels={[
                   <FunctionCredentials folder={folder} file={settingsFile} />,
                   <FunctionCode folder={folder} file={codeFile} />,
