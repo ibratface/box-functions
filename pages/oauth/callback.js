@@ -10,11 +10,12 @@ export default function OAuthCallback() {
   const userAccount = new UserAccount(boxContext)
   const router = useRouter()
 
-  useEffect(async () => {
-    if (router.query.code) {
+  useEffect(() => {
+    async function authorize() {
       await userAccount.getAuthorization(router.query.code)
       router.push('/')
     }
+    if (router.query.code) authorize()
   }, [router.query.code])
 
   return <LinearProgress>Authorizing...</LinearProgress>

@@ -7,9 +7,9 @@ import { UserAccount } from "../lib/user-account";
 
 export default function Login({ dog }) {
   const boxContext = useContext(BoxContext)
+  const userAccount = new UserAccount(boxContext)
 
   const login = debounce(() => {
-    const userAccount = new UserAccount(boxContext)
     window.location = userAccount.getAuthorizeUrl()
   }, 300)
 

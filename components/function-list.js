@@ -13,11 +13,12 @@ export default function FunctionList({ boxFolderId }) {
   const boxContext = useContext(BoxContext)
   const userAccount = new UserAccount(boxContext)
 
-  useEffect(async () => {
-    if (!functions) {
+  useEffect(() => {
+    async function listFunctions() {
       const f = await userAccount.listFunctions()
       setFunctions(f)
     }
+    if (!functions) listFunctions()
   }, [functions])
 
   if (!functions) return <LinearProgress></LinearProgress>

@@ -58,14 +58,15 @@ export default function Function() {
   const [output, setOutput] = useState()
   const [running, setRunning] = useState(false)
 
-  useEffect(async () => {
-    if (functionId) {
+  useEffect(() => {
+    async function loadFunction() {
       const folder = await userAccount.getFunctionInfo(functionId)
       setFolder(folder)
       const folderItems = await userAccount.listFunctionFiles(folder.id)
       setSettingsFile(getOrCreateFile(folderItems, folder.id, settingsFile.name, userAccount))
       setCodeFile(getOrCreateFile(folderItems, folder.id, codeFile.name, userAccount))
-    }
+    }    
+    if (functionId) loadFunction()
   }, [functionId])
 
   return (
@@ -79,9 +80,9 @@ export default function Function() {
               <VerticalTabs
                 tabs={['App Settings', 'Code', 'Triggers (WIP)', "Security (WIP)"]}
                 panels={[
-                  <FunctionCredentials folder={folder} file={settingsFile} />,
-                  <FunctionCode folder={folder} file={codeFile} />,
-                  <FunctionTrigger/>,
+                  <FunctionCredentials folder={folder} file={settingsFile} key="credentials" />,
+                  <FunctionCode folder={folder} file={codeFile} key="code" />,
+                  <FunctionTrigger key="trigger" />,
                   "Look away! I'm not ready!"]} />
               <FunctionOutput output={output} running={running} />
             </Fragment>) : null

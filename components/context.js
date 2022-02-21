@@ -2,7 +2,7 @@ import { createContext, useReducer } from "react"
 import { useCookies } from "react-cookie"
 
 
-function createBoxContext() {
+function useBoxContext() {
   const [cookies, setCookie] = useCookies(['box'])
 
   function useCookieState(name, path) {
@@ -62,7 +62,7 @@ export const BoxContext = createContext(null)
 
 export default function AppContext({ children }) {
 
-  const boxContext = createBoxContext()
+  const boxContext = useBoxContext()
 
   return (<BoxContext.Provider value={boxContext}>
     {children}

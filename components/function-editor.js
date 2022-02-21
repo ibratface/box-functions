@@ -15,11 +15,13 @@ export default function FunctionEditor({ file, extensions, placeholder }) {
     await userAccount.uploadFileVersion(file.id, value)
   }, 1200)
 
-  useEffect(async () => {
-    if (file.id) {
+  useEffect(() => {
+    async function downloadFile() {
       const blob = await userAccount.downloadFile(file.id)
       setText(blob)
     }
+
+    if (file.id) downloadFile()
   }, [file])
 
   return text ? (
