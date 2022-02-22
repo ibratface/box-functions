@@ -54,14 +54,14 @@ export default function Function() {
 
   return (
     <Container>
-      <Header />
       <AuthGuard>
+      <Header />
         {
           folder ? (
             <Fragment>
               <FunctionBar folder={folder} setOutput={setOutput} running={running} setRunning={setRunning} />
               <VerticalTabs
-                tabs={['App Credentials', 'Source', 'Triggers (WIP)', "Security (WIP)"]}
+                tabs={['App Credentials', 'Source', 'Webhooks (WIP)', "Security (WIP)"]}
                 panels={[
                   <FunctionCredentials folder={folder} file={settingsFile} key="credentials" />,
                   <FunctionSource folder={folder} file={codeFile} key="code" />,
