@@ -1,8 +1,7 @@
-import { Fragment, useContext, useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { UserAccount } from '../lib/user-account';
 import { BoxContext } from './context';
-import { IconButton, LinearProgress, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import FunctionCreate from './function-create';
+import { IconButton, LinearProgress, List, ListItem, ListItemButton, ListItemIcon, ListItemText, ListSubheader } from '@mui/material';
 import Link from 'next/link';
 import SourceIcon from '@mui/icons-material/Source';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -33,11 +32,16 @@ export default function FunctionList({ boxFolderId, dateUpdated, setDateUpdated 
   }
 
   return (
-    <List sx={{ marginBottom: 1 }}>
+    <List sx={{ marginBottom: 1, textAlign: 'left' }}
+      subheader={
+        <ListSubheader component="div" id="nested-list-subheader">
+          My Functions
+        </ListSubheader>
+      }>
       {
         functions.map(f => (
           <ListItem key={f.id} secondaryAction={
-            <IconButton edge="end" aria-label="delete" onClick={ () => deleteFunction(f.id) }>
+            <IconButton edge="end" aria-label="delete" onClick={() => deleteFunction(f.id)}>
               <DeleteIcon />
             </IconButton>
           } disablePadding>

@@ -10,7 +10,11 @@ export default function AuthGuard({ children }) {
   const router = useRouter()
 
   useEffect(() => {
-    if (!userAccount.isAuthorized()) router.push('/')
+    async function reauthorize() {
+      await userAccount.refreshTokens();
+      if (!userAccount.isAuthorized()) router.push('/')
+    }
+    reauthorize()
   }, [])
 
   return userAccount.isAuthorized() ?
