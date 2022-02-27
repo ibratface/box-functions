@@ -12,8 +12,7 @@ export async function getStaticProps({ params }) {
   }
 }
 
-export default function Readme({ content }) {
-  console.log(content)
+export default function About({ content }) {
   return (
     <Container>
       <div dangerouslySetInnerHTML={{ __html: content }} />
