@@ -1,9 +1,10 @@
 import BoxSDK from "box-node-sdk"
-import { getBoxUserAccount } from "../../../lib/box-account"
+import { getBoxClientUser } from "../../../lib/box-account"
 import vm from 'vm'
 import { Console } from 'console';
 import stream from 'stream';
 import appConfig from "../../../conf/app.config";
+import { NextApiRequest, NextApiResponse } from "next";
 
 
 function error(res, status = 404, e = null) {
@@ -12,9 +13,9 @@ function error(res, status = 404, e = null) {
 }
 
 
-function streamToString(stream) {
+function streamToString(stream): Promise<string> {
   const chunks = [];
-  return new Promise((resolve, reject) => {
+  return new Promise<string>((resolve, reject) => {
     stream.on('data', (chunk) => chunks.push(Buffer.from(chunk)));
     stream.on('error', (err) => reject(err));
     stream.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
@@ -22,11 +23,11 @@ function streamToString(stream) {
 }
 
 
-async function downloadFile(boxClient, items, filename) {
+async function downloadFile(boxClient, items, filename): Promise<string> {
   for (const i of items) {
     if (i.name === filename) {
       const stream = await boxClient.files.getReadStream(i.id)
-      return await streamToString(stream)
+      return streamToString(stream)
     }
   }
   throw {
@@ -51,18 +52,18 @@ function stripBearer(authorization) {
   return authorization.startsWith(BEARER_PREFIX) ? authorization.substring(BEARER_PREFIX.length) : null
 }
 
-function getAccessToken(req) {
-  return stripBearer(req.headers.authorization)
+function getAccessToken(req: NextApiRequest) {
+  return req.cookies['box_access_token']
 }
 
 
 async function runFunction(id, action, req, res) {
-  const boxAccount = getBoxUserAccount(getAccessToken(req))
+  const boxClient = getBoxClientUser(getAccessToken(req))
 
   try {
-    const result = await boxAccount._client.folders.getItems(id, { fields: 'id,name' })
-    const credentialsFile = await downloadFile(boxAccount._client, result.entries, appConfig.files.credentials.filename)
-    const sourceFile = await downloadFile(boxAccount._client, result.entries, appConfig.files.source.filename)
+    const result = await boxClient.folders.getItems(id, { fields: 'id,name' })
+    const credentialsFile = await downloadFile(boxClient, result.entries, appConfig.files.credentials.filename)
+    const sourceFile = await downloadFile(boxClient, result.entries, appConfig.files.source.filename)
 
     const settings = JSON.parse(credentialsFile)
     const boxSdk = BoxSDK.getPreconfiguredInstance(settings)
@@ -83,11 +84,11 @@ async function runFunction(id, action, req, res) {
 }
 
 
-export default async function handler(req, res) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { slug } = req.query
   if (slug.length > 2) error(res)
 
-  const [functionId, action] = slug
+  const [functionId, action] = slug as string[]
   switch (action) {
     case 'run':
       await runFunction(functionId, action, req, res)

@@ -1,22 +1,16 @@
-import { Breadcrumbs, Button, IconButton, Link, Typography } from "@mui/material";
-import { Box } from "@mui/material";
+import { Breadcrumbs, Button, IconButton, Link, Typography, Box } from "@mui/material";
 import PlayCircleIcon from '@mui/icons-material/PlayCircle';
-import { debounce } from "lodash";
-import { BoxContext } from "./context";
-import { useContext } from "react";
-import { UserAccount } from "../lib/user-account";
 import ShareIcon from '@mui/icons-material/Share';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import { debounce } from "lodash";
+import { Session } from "../lib/session";
 
 
 export default function FunctionBar({ folder, setOutput, running, setRunning }) {
-  const boxContext = useContext(BoxContext)
-  const userAccount = new UserAccount(boxContext)
-
 
   const runFunction = debounce(async (e) => {
     setRunning(true)
-    const res = await userAccount.runFunction(folder.id)
+    const res = await Session.Current.runFunction(folder.id)
     setRunning(false)
     setOutput(res)
   })

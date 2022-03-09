@@ -1,11 +1,10 @@
 import Head from "next/head";
 import Script from "next/script";
-import { useContext } from "react";
-import { BoxContext } from "./context";
+import { Session } from "../lib/session";
 
 
 export default function ContentExplorer({ folderId = 140751590655 }) {
-  const boxContext = useContext(BoxContext)
+  const boxClient = Session.Current.BoxClient
 
   return (
     <div className="container" style={{ height: 600 + 'px' }}>
@@ -17,7 +16,7 @@ export default function ContentExplorer({ folderId = 140751590655 }) {
         strategy='afterInteractive'
         onLoad={() => {
           const contentExplorer = new Box.ContentExplorer();
-          contentExplorer.show(folderId, boxContext.accessToken, {
+          contentExplorer.show(folderId, boxClient.token.accessToken, {
             container: ".container"
           });
         }}

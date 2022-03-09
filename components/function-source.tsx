@@ -10,7 +10,6 @@ export default function FunctionSource({ folder, file }) {
       <div>{file.name}</div>
       <Box sx={{ textAlign: 'left', border: 1, borderColor: 'text.disabled', marginTop: 1 }}>
         <FunctionEditor
-          folder={folder}
           file={file}
           extensions={[javascript({ jsx: true })]}
           placeholder="Paste your app settings here"

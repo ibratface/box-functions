@@ -1,23 +1,20 @@
 import CodeMirror from "@uiw/react-codemirror";
 import { useContext, useEffect, useState } from "react";
 import { debounce } from "lodash";
-import { BoxContext } from "./context";
-import { UserAccount } from "../lib/user-account";
 import { LinearProgress } from "@mui/material";
+import { Session } from "../lib/session";
 
 
 export default function FunctionEditor({ file, extensions, placeholder }) {
-  const boxContext = useContext(BoxContext)
-  const userAccount = new UserAccount(boxContext)
   const [text, setText] = useState(null)
 
   const onChange = debounce(async (value, viewUpdate) => {
-    await userAccount.uploadFileVersion(file.id, value)
+    await Session.Current.updateFile(file.id, value)
   }, 1200)
 
   useEffect(() => {
     async function downloadFile() {
-      const blob = await userAccount.downloadFile(file.id)
+      const blob = await Session.Current.downloadFile(file.id)
       setText(blob)
     }
 

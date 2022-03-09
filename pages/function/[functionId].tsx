@@ -7,12 +7,11 @@ import Header from "../../components/header";
 import VerticalTabs from "../../components/vertical-tabs";
 import FunctionBar from "../../components/function-bar";
 import FunctionOutput from "../../components/function-output";
-import { BoxContext } from "../../components/context";
-import { UserAccount } from "../../lib/user-account";
 import { useRouter } from "next/router";
 import React from 'react';
 import FunctionTrigger from "../../components/function-trigger";
 import appConfig from "../../conf/app.config";
+import { Session } from "../../lib/session";
 
 
 function findItem(items, name) {
@@ -29,8 +28,6 @@ function getOrCreateFile(folderItems, folderId, filename, account, content) {
 
 
 export default function Function() {
-  const boxContext = useContext(BoxContext)
-  const userAccount = new UserAccount(boxContext)
   const router = useRouter()
   const { functionId } = router.query
 
@@ -43,11 +40,11 @@ export default function Function() {
 
   useEffect(() => {
     async function loadFunction() {
-      const folder = await userAccount.getFunctionInfo(functionId)
+      const folder = await Session.Current.getFunctionInfo(functionId)
       setFolder(folder)
-      const folderItems = await userAccount.listFunctionFiles(folder.id)
-      setSettingsFile(getOrCreateFile(folderItems, folder.id, settingsFile.name, userAccount, appConfig.files.credentials.filename))
-      setCodeFile(getOrCreateFile(folderItems, folder.id, codeFile.name, userAccount, appConfig.files.source.filename))
+      const folderItems = await Session.Current.listFunctionFiles(folder.id)
+      setSettingsFile(getOrCreateFile(folderItems, folder.id, settingsFile.name, Session.Current, appConfig.files.credentials.filename))
+      setCodeFile(getOrCreateFile(folderItems, folder.id, codeFile.name, Session.Current, appConfig.files.source.filename))
     }
     if (functionId) loadFunction()
   }, [functionId])
