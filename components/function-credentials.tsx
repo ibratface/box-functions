@@ -1,20 +1,15 @@
 import { json } from "@codemirror/lang-json";
 import { Box } from "@mui/material";
-import { Fragment } from "react";
-import FunctionEditor from "./function-editor";
 
 
-export default function FunctionCredentials({ folder, file }) {
+export default function FunctionCredentials({ fn }) {
   return (
-    <Fragment>
-      <div>{file.name}</div>
-      <Box sx={{ textAlign: 'left', border: 1, borderColor: 'text.disabled', marginTop: 1 }}>
-        <FunctionEditor
+    <Box sx={{ textAlign: 'left', border: 1, borderColor: 'text.disabled', marginTop: 1 }}>
+      {/* <FunctionEditor
           file={file}
           extensions={[json()]}
           placeholder="Paste your app settings here"
-        />
-      </Box>
-    </Fragment>
+        /> */}
+    </Box>
   )
 }

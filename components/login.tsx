@@ -1,11 +1,11 @@
 import { Box, Button } from "@mui/material";
 import { debounce } from "lodash";
-import { Session } from "../lib/session";
+import { UserSession } from "../lib/user-session";
 
 
 export default function Login() {
   const login = debounce(() => {
-    Session.Current.getAuthorization()
+    UserSession.Current.getAuthorization()
   }, 300)
 
   return (

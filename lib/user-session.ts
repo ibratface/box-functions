@@ -1,44 +1,26 @@
 import axios from "axios";
 import { BoxClient } from "./box-api";
-import AppContext from "./user-context";
-
-const credentials_template = `{
-  "boxAppSettings": {
-    "clientID": "abcdefghijklmnopqrstuvwxyz",
-    "clientSecret": "********************************",
-    "appAuth": {
-      "publicKeyID": "",
-      "privateKey": "",
-      "passphrase": ""
-    }
-  },
-  "enterpriseID": "123456789"
-}`
-
-const source_template = `//
-// Context Variables:
-//   box - Box Node SDK BoxClient instance configured using your app settings
-//   console - standard debugging console
-//
-const me = await box.users.get(box.CURRENT_USER_ID)
-console.log("Hello World, my user is:")
-console.log(me)`
+import { BoxFunction } from "./box-function";
+import UserContext from "./user-context";
 
 
-export class Session {
 
-  private static instance: Session
+
+
+export class UserSession {
+
+  private static instance: UserSession
 
   static get Current() {
-    if (!Session.instance) Session.instance = new Session()
-    return Session.instance
+    if (!UserSession.instance) UserSession.instance = new UserSession()
+    return UserSession.instance
   }
 
   private _boxClient: BoxClient
-  private _context: AppContext
+  private _context: UserContext
 
   private constructor() {
-    this._context = AppContext.Current
+    this._context = UserContext.Current
     this._boxClient = new BoxClient(this._context)
   }
 
@@ -98,11 +80,8 @@ export class Session {
     return f
   }
 
-  async createFunction(name) {
-    const fn = await this._boxClient.createFolder(name, this._context.rootFolderID)
-    await this._boxClient.uploadFile(fn.id, 'source.js', source_template)
-    await this._boxClient.uploadFile(fn.id, 'credentials.json', credentials_template)
-    return fn
+  createFunction(name) {
+    return BoxFunction.create(name)
   }
 
   getFunctionInfo(functionId) {
@@ -137,3 +116,5 @@ export class Session {
     }).then(res => res.data)
   }
 }
+
+

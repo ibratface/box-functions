@@ -1,8 +1,7 @@
-import Context from '@mui/base/TabsUnstyled/TabsContext';
 import { Grid, Link, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { useContext, useEffect } from 'react';
-import AppContext from '../../lib/user-context';
+import UserContext from '../../lib/user-context';
 import Header from '../../components/header';
 import Login from '../../components/login';
 
@@ -24,7 +23,7 @@ export default function OAuthLogin({ env }) {
 
   useEffect(() => {
     if (env) {
-      const context = AppContext.Current;
+      const context = UserContext.Current;
       context.clientID = env.clientID
       context.clientSecret = env.clientSecret
       context.serviceAccountID = env.serviceAccountID

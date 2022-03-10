@@ -26,6 +26,26 @@ const formData = (data) => {
 }
 
 
+export interface BoxUserToken {
+  accessToken: string
+  refreshToken: string
+}
+
+
+export interface BoxJsonWebToken {
+  boxAppSettings: {
+    clientID: string,
+    clientSecret: string
+    appAuth: {
+      publicKeyID: string,
+      privateKey: string
+      passphrase: string
+    }
+  }
+  enterpriseID: string
+}
+
+
 interface BoxTokenResponse {
   access_token: string;
   expires_in: number;
@@ -33,7 +53,7 @@ interface BoxTokenResponse {
 }
 
 
-export class BoxToken {
+export class BoxClientToken implements BoxUserToken {
 
   cookies: Cookies
 
@@ -71,11 +91,11 @@ interface BoxClientConfig {
 export class BoxClient {
 
   private _config: BoxClientConfig
-  private _token: BoxToken
+  private _token: BoxClientToken
 
   constructor(config) {
     this._config = config
-    this._token = new BoxToken()
+    this._token = new BoxClientToken()
   }
 
   getAuthorizationCode() {
@@ -95,24 +115,24 @@ export class BoxClient {
       client_id: this._config.clientID,
       client_secret: this._config.clientSecret,
     }).then(res => {
-      this._token = new BoxToken(res.data)
+      this._token = new BoxClientToken(res.data)
       return this._token
     })
   }
 
-  refreshToken(token: BoxToken = this._token) {
+  refreshToken(token: BoxClientToken = this._token) {
     return axios.post(BoxURLs.oauth, {
       grant_type: 'refresh_token',
       client_id: this._config.clientID,
       client_secret: this._config.clientSecret,
       refresh_token: token.refreshToken,
     }).then(res => {
-      this._token = new BoxToken(res.data)
+      this._token = new BoxClientToken(res.data)
       return this._token
     })
   }
 
-  get token(): BoxToken {
+  get token(): BoxClientToken {
     return this._token
   }
 

@@ -14,7 +14,7 @@ function TabPanel(props) {
       id={`vertical-tabpanel-${index}`}
       aria-labelledby={`vertical-tab-${index}`}
       {...other}
-      sx={{ p: 2, flexGrow: 1, textAlign: 'left', overflow: 'auto' }}
+      sx={{ flexGrow: 1, p: 2, textAlign: 'left', overflow: 'auto' }}
     >
       {children}
     </Box>
@@ -51,7 +51,7 @@ export default function VerticalTabs({ tabs, panels }) {
         value={value}
         onChange={handleChange}
         aria-label="Vertical tabs example"
-        sx={{ borderRight: 1, borderColor: 'divider', minHeight: 500, minWidth: 200 }}
+        sx={{ borderRight: 1, borderColor: 'divider', minHeight: 480, minWidth: 200 }}
       >
         {
           tabs.map((t, i) => (

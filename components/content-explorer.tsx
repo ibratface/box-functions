@@ -1,10 +1,10 @@
 import Head from "next/head";
 import Script from "next/script";
-import { Session } from "../lib/session";
+import { UserSession } from "../lib/user-session";
 
 
 export default function ContentExplorer({ folderId = 140751590655 }) {
-  const boxClient = Session.Current.BoxClient
+  const boxClient = UserSession.Current.BoxClient
 
   return (
     <div className="container" style={{ height: 600 + 'px' }}>

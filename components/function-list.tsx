@@ -3,24 +3,24 @@ import { Box, IconButton, LinearProgress, List, ListItem, ListItemButton, ListIt
 import Link from 'next/link';
 import SourceIcon from '@mui/icons-material/Source';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { Session } from '../lib/session';
+import { UserSession } from '../lib/user-session';
 import useSWR, { mutate } from 'swr';
 import FunctionCreate from './function-create';
 
 
 export default function FunctionList({ boxFolderId }) {
 
-  const { data: functions, error } = useSWR('/function', () => Session.Current.listFunctions())
+  const { data: functions, error } = useSWR('/function', () => UserSession.Current.listFunctions())
 
   if (!functions) return <LinearProgress sx={{ m: 1 }}></LinearProgress>
 
   async function createFunction(name) {
-    await Session.Current.createFunction(name)
+    await UserSession.Current.createFunction(name)
     mutate('/function')
   }
 
   async function deleteFunction(functionId) {
-    await Session.Current.deleteFunction(functionId)
+    await UserSession.Current.deleteFunction(functionId)
     mutate('/function')
   }
 

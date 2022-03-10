@@ -1,10 +1,10 @@
-export default class AppContext {
+export default class UserContext {
 
-  private static instance: AppContext
+  private static instance: UserContext
 
-  static get Current(): AppContext {
-    if (!AppContext.instance && typeof window != 'undefined') AppContext.instance = new AppContext(window.localStorage)
-    return AppContext.instance;
+  static get Current(): UserContext {
+    if (!UserContext.instance && typeof window != 'undefined') UserContext.instance = new UserContext(window.localStorage)
+    return UserContext.instance;
   }
 
   private storage: Storage

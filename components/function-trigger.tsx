@@ -68,23 +68,6 @@ export default function FunctionTrigger() {
 
   return (
     <Box sx={{ p: 1 }}>
-      <FormControl sx={{ minWidth: 80, display: 'block' }}>
-        <InputLabel id="trigger-type-label">Type</InputLabel>
-        <Select
-          labelId="trigger-type-label"
-          id="trigger-type"
-          label="Type"
-          value={'webhook'}
-          autoWidth
-        >
-          <MenuItem value={'none'}>None</MenuItem>
-          <MenuItem value={'schedule'}>Schedule</MenuItem>
-          <MenuItem value={'webhook'}>Webhook</MenuItem>
-        </Select>
-      </FormControl>
-      <FormControl sx={{ mt: 2, display: 'block' }}>
-        <TextField label="URL" sx={{ minWidth: 600 }} disabled value='https://function.box.com/api/function/123456789/execute'></TextField>
-      </FormControl>
       <FormControl sx={{ mt: 2, display: 'flex', flexDirection: 'row', alignItems: "center" }}>
         <TextField label="Target Item" sx={{ minWidth: 240 }} disabled value='/path/to/item'></TextField>
         <Button variant="contained" sx={{ ml: 1 }} color="secondary">Choose ...</Button>
