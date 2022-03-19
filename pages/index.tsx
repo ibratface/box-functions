@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Box, Container } from '@mui/material';
+import { useEffect, useState } from 'react';
+import { Container } from '@mui/material';
 import AuthGuard from '../components/auth-guard';
 import Header from '../components/header';
-import FunctionList from '../components/function-list';
-import UserContext from '../lib/user-context';
+import FunctionList from '../components/function/function-list';
+import UserContext from '../lib/client/user-context';
 
 
 export default function Home() {

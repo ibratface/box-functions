@@ -1,6 +1,6 @@
 import { Box, Button } from "@mui/material";
 import { debounce } from "lodash";
-import { UserSession } from "../lib/user-session";
+import { UserSession } from "../lib/client/user-session";
 
 
 export default function Login() {

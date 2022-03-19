@@ -1,11 +1,12 @@
 import { LinearProgress } from "@mui/material";
 import { useRouter } from "next/router"
 import { useEffect } from "react"
-import { UserSession } from "../../lib/user-session";
+import { UserSession } from "../../lib/client/user-session";
 
 
 export default function OAuthCallback() {
   const router = useRouter()
+
 
   useEffect(() => {
     async function authorize() {
@@ -14,7 +15,7 @@ export default function OAuthCallback() {
       router.push('/')
     }
     if (router.query.code) authorize()
-  }, [router.query.code])
+  }, [router, router.query.code])
 
   return <LinearProgress/>
 }

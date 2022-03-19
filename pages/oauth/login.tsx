@@ -1,7 +1,6 @@
-import { Grid, Link, Typography } from '@mui/material';
-import { Box } from '@mui/system';
+import { Box, Grid, Link, Typography } from '@mui/material';
 import { useContext, useEffect } from 'react';
-import UserContext from '../../lib/user-context';
+import UserContext from '../../lib/client/user-context';
 import Header from '../../components/header';
 import Login from '../../components/login';
 

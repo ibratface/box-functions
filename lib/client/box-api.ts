@@ -1,6 +1,7 @@
 
 import axios from "axios";
 import Cookies from "universal-cookie";
+import { IBoxTokenResponse, IBoxUserToken, IBoxWebhookRequest } from "../common/box-types";
 
 
 const BoxURLs = {
@@ -10,6 +11,7 @@ const BoxURLs = {
   files: 'https://api.box.com/2.0/files',
   collaborations: 'https://api.box.com/2.0/collaborations',
   uploads: 'https://upload.box.com/api/2.0/files',
+  webhooks: 'https://api.box.com/2.0/webhooks',
 }
 
 
@@ -26,38 +28,17 @@ const formData = (data) => {
 }
 
 
-export interface BoxUserToken {
-  accessToken: string
-  refreshToken: string
+export function getItemFullPath(item) {
+  const path = item.path_collection.entries.reduce((acc, next) => `${acc}/${next.name}`, '')
+  return `${path}/${item.name}`
 }
 
 
-export interface BoxJsonWebToken {
-  boxAppSettings: {
-    clientID: string,
-    clientSecret: string
-    appAuth: {
-      publicKeyID: string,
-      privateKey: string
-      passphrase: string
-    }
-  }
-  enterpriseID: string
-}
-
-
-interface BoxTokenResponse {
-  access_token: string;
-  expires_in: number;
-  refresh_token: string;
-}
-
-
-export class BoxClientToken implements BoxUserToken {
+export class BoxClientToken implements IBoxUserToken {
 
   cookies: Cookies
 
-  constructor(res: BoxTokenResponse = null) {
+  constructor(res: IBoxTokenResponse = null) {
     this.cookies = new Cookies('box');
     if (res) {
       this.cookies.set('box_access_token', res.access_token, { maxAge: res.expires_in, path: '/' })
@@ -93,7 +74,7 @@ export class BoxClient {
   private _config: BoxClientConfig
   private _token: BoxClientToken
 
-  constructor(config) {
+  constructor(config: BoxClientConfig) {
     this._config = config
     this._token = new BoxClientToken()
   }
@@ -137,9 +118,7 @@ export class BoxClient {
   }
 
   private async bearer(): Promise<string> {
-    if (!this._token.IsValid) 
-    {
-      console.log("doing token refresh", this.token.accessToken, this.token.refreshToken)
+    if (!this._token.IsValid) {
       await this.refreshToken(this._token)
     }
     return `Bearer ${this._token.accessToken}`
@@ -149,7 +128,14 @@ export class BoxClient {
     const fetch = axios.create({
       headers: { authorization: await this.bearer() }
     })
-    return await fetch.request(config).then(res => res.data);
+    return await fetch.request(config).then(res => res.data).catch(e => {
+      if (e.response) {
+        throw e.response.data
+      }
+      else {
+        throw e
+      }
+    });
   }
 
   createFolder(name, parentId) {
@@ -174,11 +160,11 @@ export class BoxClient {
     })
   }
 
-  getFolderInfo(folderId) {
+  getFolderInfo(folderId, fields = 'id,name') {
     return this.request({
       method: 'get',
       url: BoxURLs.folders + `/${folderId}`,
-      params: { fields: 'id,name' }
+      params: { fields }
     })
   }
 
@@ -190,6 +176,14 @@ export class BoxClient {
         'content-type': 'multipart/form-data'
       },
       params: { fields: 'id,name' }
+    })
+  }
+
+  getFileInfo(fileId, fields = 'id,name') {
+    return this.request({
+      method: 'get',
+      url: BoxURLs.files + `/${fileId}`,
+      params: { fields }
     })
   }
 
@@ -253,6 +247,21 @@ export class BoxClient {
         role: 'viewer'
       },
       params: { fields: 'id' }
+    })
+  }
+
+  createWebhook(args: IBoxWebhookRequest) {
+    return this.request({
+      method: 'post',
+      url: BoxURLs.webhooks,
+      data: args
+    })
+  }
+
+  deleteWebhook(webhookId) {
+    return this.request({
+      method: 'delete',
+      url: `${BoxURLs.webhooks}/${webhookId}`
     })
   }
 }

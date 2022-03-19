@@ -4,13 +4,13 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
 
 
-export default function FunctionCreate({ createFunction }) {
+export default function FunctionCreate({ onCreate }) {
   const [creating, setCreating] = useState(false)
   const functionNameField = useRef<HTMLInputElement>();
 
   const onClickCreate = async (e) => {
     setCreating(true)
-    createFunction(functionNameField.current.value)
+    await onCreate(functionNameField.current.value)
     functionNameField.current.value = null
     setCreating(false)
   }

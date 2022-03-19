@@ -1,10 +1,5 @@
-import axios from "axios";
 import { BoxClient } from "./box-api";
-import { BoxFunction } from "./box-function";
 import UserContext from "./user-context";
-
-
-
 
 
 export class UserSession {
@@ -33,7 +28,7 @@ export class UserSession {
   }
 
   async reauthorize() {
-    if (this._boxClient.token.refreshToken) this._boxClient.refreshToken()
+    if (!this._boxClient.token.accessToken && this._boxClient.token.refreshToken) await this._boxClient.refreshToken()
   }
 
   get IsValid() {
@@ -73,47 +68,6 @@ export class UserSession {
         throw e
       }
     }
-  }
-
-  async listFunctions() {
-    const { entries: f } = await this._boxClient.listFolderItems(this._context.rootFolderID)
-    return f
-  }
-
-  createFunction(name) {
-    return BoxFunction.create(name)
-  }
-
-  getFunctionInfo(functionId) {
-    return this._boxClient.getFolderInfo(functionId)
-  }
-
-  async listFunctionFiles(functionId) {
-    const { entries: f } = await this._boxClient.listFolderItems(functionId)
-    return f
-  }
-
-  uploadFile(functionId, filename, content) {
-    return this._boxClient.uploadFile(functionId, filename, content)
-  }
-
-  updateFile(fileId, content) {
-    return this._boxClient.uploadFileVersion(fileId, content)
-  }
-
-  downloadFile(fileId) {
-    return this._boxClient.downloadFile(fileId)
-  }
-
-  deleteFunction(functionId) {
-    return this._boxClient.deleteFolder(functionId)
-  }
-
-  runFunction(functionId) {
-    return axios({
-      method: 'get',
-      url: `/api/function/${functionId}/run`,
-    }).then(res => res.data)
   }
 }
 

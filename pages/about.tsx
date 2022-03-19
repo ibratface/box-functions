@@ -1,5 +1,5 @@
 import { Box, Container, Link } from "@mui/material"
-import { formatHTML } from "../lib/markdown"
+import { formatHTML } from "../lib/server/markdown"
 
 
 export async function getStaticProps({ params }) {
