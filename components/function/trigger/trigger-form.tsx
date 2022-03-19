@@ -20,7 +20,6 @@ export function TriggerCard({ trigger, onDelete }: IProps) {
 
   useEffect(() => {
     async function getItemPath() {
-      console.log('getItemPath')
       let target = null;
       target = trigger.target.type === 'file' ? await UserSession.Current.BoxClient.getFileInfo(trigger.target.id, 'name,path_collection') : null
       target = trigger.target.type === 'folder' ? await UserSession.Current.BoxClient.getFolderInfo(trigger.target.id, 'name,path_collection') : null
@@ -42,7 +41,7 @@ export function TriggerCard({ trigger, onDelete }: IProps) {
           <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', width: '100%' }}>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, width: 'auto' }}>
               <Typography variant="caption">Target Item</Typography>
-              <Typography variant="body2" sx={{ mb: 1 }}>{itemPath || trigger.target.id }</Typography>
+              <Typography variant="body2" sx={{ mb: 1 }}>{itemPath ? itemPath : trigger.id}</Typography>
               <Typography variant="caption">Events</Typography>
               <TriggerEventChips events={trigger.triggers} />
             </Box>

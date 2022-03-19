@@ -44,7 +44,7 @@ const useFunctionState = (functionId: string) => {
 
   async function updateSource(text: string) {
     await fn.updateSource(text)
-    // setSource(text)
+    setSource(text)
   }
 
   async function updateCredential(credential: ICredential) {
