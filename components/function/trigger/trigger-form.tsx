@@ -64,7 +64,7 @@ export function TriggerForm({ onCreate }) {
     <Fragment>
       {expanded ? null : <Button variant="outlined" onClick={() => setExpanded(true)}>+ Add Trigger</Button>}
       <Fade in={expanded}>
-        <Fragment>
+        <Box>
           {error ? <Alert variant="filled" severity="error">{error}</Alert> : null}
           <Paper sx={{ p: 2 }}>
             <TriggerTargetPicker target={[target, setTarget]} isCreating={isCreating}></TriggerTargetPicker>
@@ -79,7 +79,7 @@ export function TriggerForm({ onCreate }) {
                 onClick={onClickCreate}>Create</LoadingButton>
             </Box>
           </Paper>
-        </Fragment>
+        </Box>
       </Fade >
     </Fragment >
   )

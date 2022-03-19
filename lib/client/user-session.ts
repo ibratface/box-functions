@@ -47,8 +47,8 @@ export class UserSession {
       rootFolderId = folder.id
     }
     catch (e) {
-      if (e.response && e.response.data.status == 409 && e.response.data.code === 'item_name_in_use') {
-        rootFolderId = e.response.data.context_info.conflicts[0].id
+      if (e.status == 409 && e.code === 'item_name_in_use') {
+        rootFolderId = e.context_info.conflicts[0].id
       }
       else {
         throw e
@@ -61,7 +61,7 @@ export class UserSession {
       await this._boxClient.shareFolderWithUserLogin(rootFolderId, this._context.serviceAccountID)
     }
     catch (e) {
-      if (e.response && e.response.data.status == 400 && e.response.data.code === 'user_already_collaborator') {
+      if (e.status == 400 && e.code === 'user_already_collaborator') {
         // do nothing
       }
       else {
