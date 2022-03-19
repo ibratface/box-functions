@@ -29,7 +29,7 @@ const formData = (data) => {
 
 
 export function getItemFullPath(item) {
-  const path = item.path_collection.entries.reduce((acc, next) => `${acc}/${next.name}`, '')
+  const path = item.path_collection?.entries?.reduce((acc, next) => `${acc}/${next.name}`, '')
   return `${path}/${item.name}`
 }
 

@@ -12,7 +12,7 @@ export default {
       "clientSecret": process.env.BOX_BACKEND_CLIENT_SECRET,
       "appAuth": {
         "publicKeyID": process.env.BOX_BACKEND_PUBLIC_KEY_ID,
-        "privateKey": process.env.BOX_BACKEND_PRIVATE_KEY.replace(/\\n/g, '\n'),
+        "privateKey": process.env.BOX_BACKEND_PRIVATE_KEY,
         "passphrase": process.env.BOX_BACKEND_PASSPHRASE
       }
     },

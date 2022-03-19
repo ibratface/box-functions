@@ -1,10 +1,11 @@
 import { Alert, Box, Button, debounce, Fade, IconButton, LinearProgress, Paper, TextField, Typography } from "@mui/material";
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { getItemFullPath } from "../../../lib/client/box-api";
 import TriggerEventPicker, { TriggerEventChips } from "./trigger-event-picker";
 import TriggerTargetPicker from "./trigger-target-picker";
 import CloseIcon from '@mui/icons-material/Close';
 import { LoadingButton } from "@mui/lab";
+import { UserSession } from "../../../lib/client/user-session";
 
 
 interface IProps {
@@ -15,6 +16,18 @@ interface IProps {
 
 export function TriggerCard({ trigger, onDelete }: IProps) {
   const [isDeleting, setIsDeleting] = useState<boolean>(false)
+  const [itemPath, setItemPath] = useState<string>()
+
+  useEffect(() => {
+    async function getItemPath() {
+      console.log('getItemPath')
+      let target = null;
+      target = trigger.target.type === 'file' ? await UserSession.Current.BoxClient.getFileInfo(trigger.target.id, 'name,path_collection') : null
+      target = trigger.target.type === 'folder' ? await UserSession.Current.BoxClient.getFolderInfo(trigger.target.id, 'name,path_collection') : null
+      if (target) setItemPath(getItemFullPath(target))
+    }
+    getItemPath()
+  }, [trigger])
 
   const onClickDelete = debounce(async () => {
     setIsDeleting(true)
@@ -25,13 +38,13 @@ export function TriggerCard({ trigger, onDelete }: IProps) {
   return (
     <Paper component="form" sx={{ display: 'flex', flexDirection: 'column', gap: 1, p: 2 }}>
       {
-        isDeleting ? <LinearProgress></LinearProgress> :
+        isDeleting || !trigger ? <LinearProgress></LinearProgress> :
           <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', width: '100%' }}>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, width: '90%' }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, width: 'auto' }}>
               <Typography variant="caption">Target Item</Typography>
-              <TextField fullWidth variant="filled" value={getItemFullPath(trigger.target)} InputProps={{ readOnly: true }}></TextField>
+              <Typography variant="body2" sx={{ mb: 1 }}>{itemPath || trigger.target.id }</Typography>
               <Typography variant="caption">Events</Typography>
-              <TriggerEventChips events={trigger.events} />
+              <TriggerEventChips events={trigger.triggers} />
             </Box>
             <IconButton size="small" onClick={onClickDelete}><CloseIcon fontSize="inherit" /></IconButton>
           </Box>

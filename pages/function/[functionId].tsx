@@ -21,7 +21,7 @@ const useFunctionState = (functionId: string) => {
   const [name, setName] = useState<string>()
   const [source, setSource] = useState<string>()
   const [credential, setCredential] = useState<ICredential>()
-  const [triggers, setTriggers] = useState<ITrigger[]>()
+  const [triggers, setTriggers] = useState<ITrigger[]>([])
   const [output, setOutput] = useState<string>()
   const [isRunning, setIsRunning] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
