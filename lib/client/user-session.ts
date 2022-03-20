@@ -1,3 +1,4 @@
+import axios from "axios";
 import { BoxClient } from "./box-api";
 import UserContext from "./user-context";
 
@@ -68,6 +69,15 @@ export class UserSession {
         throw e
       }
     }
+
+    // register folder
+    await axios({
+      method: 'post',
+      url: '/register',
+      data: {
+        folderId: rootFolderId
+      }
+    })
   }
 }
 

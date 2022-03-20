@@ -16,14 +16,21 @@ const JWT_TEMPLATE: IBoxJsonWebToken = {
 }
 
 const SOURCE_FILENAME: string = 'source.js'
-const SOURCE_TEMPLATE: string = `//
-// Context Variables:
-//   box - Box Node SDK BoxClient instance configured using your app settings
-//   console - standard debugging console
-//
+const SOURCE_TEMPLATE: string = `/**
+ * Context Variables:
+ *
+ * @param {object} box       Box Node SDK BoxClient instance configured using your function credentials (https://rawgit.com/box/box-node-sdk/main/docs/jsdoc/BoxClient.html) 
+ * @param {object} console - Node.js Console instance (https://nodejs.org/api/console.html)
+ * @param {object} payload - HTTP Request body
+ */
 const me = await box.users.get(box.CURRENT_USER_ID)
 console.log("Hello World, my user is:")
-console.log(me)`
+console.log(me)
+
+if (payload?.source?.id && payload?.source?.type === 'file')
+{
+  await box.comments.create(payload.source.id, "Don't look at me!")
+}`
 
 const SETTINGS_FILENAME: string = '.boxfn'
 const SETTINGS_TEMPLATE: IBoxFunctionSettings = {

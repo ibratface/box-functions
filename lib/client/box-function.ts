@@ -100,7 +100,7 @@ export class BoxFunction {
   async run(): Promise<string> {
     return axios({
       method: 'get',
-      url: `/api/function/run/${this.id}`,
+      url: `/api/function/${this.id}/run`,
     }).then(res => res.data)
   }
 
