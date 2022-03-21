@@ -6,6 +6,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import useSWR, { mutate } from 'swr';
 import FunctionCreate from './function-create';
 import { BoxFunction } from '../../lib/client/box-function';
+import { useRouter } from 'next/router';
 
 
 function FunctionItem({ fn, onDelete }) {
@@ -37,14 +38,16 @@ function FunctionItem({ fn, onDelete }) {
 
 
 export default function FunctionList({ boxFolderId }) {
-
+  const router = useRouter()
   const { data: functions, error } = useSWR('/function', () => BoxFunction.list())
 
   if (!functions) return <LinearProgress sx={{ m: 1 }}></LinearProgress>
 
   async function createFunction(name) {
-    await BoxFunction.create(name)
-    await mutate('/function')
+    const fn = await BoxFunction.create(name)
+    mutate('/function')
+    router.push(`/function/${fn.id}`)
+    return fn
   }
 
   async function deleteFunction(functionId) {

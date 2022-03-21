@@ -1,16 +1,24 @@
-import { Stack, TextField } from '@mui/material';
+import { Alert, Stack, TextField } from '@mui/material';
 import { useRef, useState } from 'react';
 import LoadingButton from '@mui/lab/LoadingButton';
 import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
 
 
 export default function FunctionCreate({ onCreate }) {
-  const [creating, setCreating] = useState(false)
+  const [creating, setCreating] = useState<boolean>(false)
+  const [error, setError] = useState<string>()
   const functionNameField = useRef<HTMLInputElement>();
 
   const onClickCreate = async (e) => {
     setCreating(true)
-    await onCreate(functionNameField.current.value)
+    try {
+      await onCreate(functionNameField.current.value)
+      setError(null)
+    }
+    catch (e)
+    {
+      setError(e.message)
+    }
     functionNameField.current.value = null
     setCreating(false)
   }
@@ -27,6 +35,7 @@ export default function FunctionCreate({ onCreate }) {
       >
         Create
       </LoadingButton>
+      {error ? <Alert variant="filled" severity="error">{error}</Alert> : null}
     </Stack>
   )
 }
