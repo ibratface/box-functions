@@ -73,7 +73,7 @@ export class UserSession {
     // register folder
     await axios({
       method: 'post',
-      url: '/register',
+      url: '/api/register',
       data: {
         folderId: rootFolderId
       }
