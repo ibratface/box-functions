@@ -52,3 +52,13 @@ export interface IBoxWebhookRequest {
   triggers: string[]
 }
 
+
+export interface IBoxWebhook {
+  id?: string
+  address?: string
+  target: {
+    id: string,
+    type: string
+  }
+  triggers?: string[]
+}

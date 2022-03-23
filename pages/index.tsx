@@ -17,7 +17,7 @@ export default function Home() {
     <Container>
       <AuthGuard>
         <Header />
-        {folderId ? <FunctionList boxFolderId={folderId}></FunctionList> : null}
+        {folderId ? <FunctionList rootFolderId={folderId}></FunctionList> : null}
       </AuthGuard>
     </Container>
   )

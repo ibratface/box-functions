@@ -3,10 +3,8 @@ import { Box, IconButton, LinearProgress, List, ListItem, ListItemButton, ListIt
 import Link from 'next/link';
 import SourceIcon from '@mui/icons-material/Source';
 import CloseIcon from '@mui/icons-material/Close';
-import useSWR, { mutate } from 'swr';
 import FunctionCreate from './function-create';
-import { BoxFunction } from '../../lib/client/box-function';
-import { useRouter } from 'next/router';
+import { useFunctionList } from '../../lib/client/box-function';
 
 
 function FunctionItem({ fn, onDelete }) {
@@ -37,23 +35,10 @@ function FunctionItem({ fn, onDelete }) {
 }
 
 
-export default function FunctionList({ boxFolderId }) {
-  const router = useRouter()
-  const { data: functions, error } = useSWR('/function', () => BoxFunction.list())
+export default function FunctionList({ rootFolderId }) {
+  const { functions, error, createFunction, deleteFunction } = useFunctionList(rootFolderId)
 
   if (!functions) return <LinearProgress sx={{ m: 1 }}></LinearProgress>
-
-  async function createFunction(name) {
-    const fn = await BoxFunction.create(name)
-    mutate('/function')
-    router.push(`/function/${fn.id}`)
-    return fn
-  }
-
-  async function deleteFunction(functionId) {
-    await BoxFunction.delete(functionId)
-    await mutate('/function')
-  }
 
   return (
     <Box>

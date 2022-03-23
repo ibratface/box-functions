@@ -2,20 +2,20 @@ import { json } from "@codemirror/lang-json";
 import { Alert, Box, debounce, LinearProgress } from "@mui/material";
 import CodeMirror from "@uiw/react-codemirror";
 import { useRef, useState } from "react";
-import AppConfig from "../../conf/app.config";
+import { JWT_TEMPLATE } from "../../conf/app.config";
 import { IBoxCredentialType, IBoxJsonWebToken } from "../../lib/common/box-types";
 
 
 export default function FunctionCredentials({ credential, updateCredential }) {
-  const text = useRef<string>(JSON.stringify(credential?.value, null, 2) || '')
+  const text = useRef<string>(credential?.value ? JSON.stringify(credential?.value, null, 2) : '')
   const [isSaving, setIsSaving] = useState<boolean>(false)
   const [error, setError] = useState<string>()
 
-  const onChangeJWT = debounce((value, viewUpdate) => {
+  const onChangeJWT = debounce(async (value, viewUpdate) => {
     setIsSaving(true)
     try {
       const jsonValue: IBoxJsonWebToken = JSON.parse(value)
-      updateCredential({
+      await updateCredential({
         type: IBoxCredentialType.JWT,
         value: jsonValue
       })
@@ -27,14 +27,14 @@ export default function FunctionCredentials({ credential, updateCredential }) {
   }, 1200)
 
   return (
-    <Box sx={{ textAlign: 'left', border: 1, borderColor: 'text.disabled' }}>
-      {!credential || isSaving ? <LinearProgress /> : null}
+    <Box sx={{ p: 1 }}>
+      {isSaving ? <LinearProgress /> : null}
       {error ? <Alert variant="filled" severity="error">{error}</Alert> : null}
       <CodeMirror
         value={text.current}
         extensions={[json()]}
         onChange={onChangeJWT}
-        placeholder={`// Paste your app settings here\n${JSON.stringify(AppConfig.credential.template, null, 2)}`}
+        placeholder={`// Paste your app settings here\n${JSON.stringify(JWT_TEMPLATE, null, 2)}`}
         theme='dark'
       />
     </Box>

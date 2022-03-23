@@ -2,8 +2,8 @@ import BoxSDK from 'box-node-sdk'
 import boxConfig from '../../conf/box.config'
 import stream from 'stream';
 import { Console } from 'console';
-import AppConfig from "../../conf/app.config";
 import { NextApiRequest } from 'next';
+import { FUNCTION_FILENAME } from '../../conf/app.config';
 
 
 export function getBoxClientUser(token) {
@@ -48,13 +48,8 @@ async function downloadFile(boxClient, items, filename): Promise<string> {
 export async function unpackFunction(functionId: string) {
   const boxClient = getBoxClientServiceAccount()
   const result = await boxClient.folders.getItems(functionId, { fields: 'id,name' })
-  const settingsFile = await downloadFile(boxClient, result.entries, AppConfig.settings.filename)
-  const sourceFile = await downloadFile(boxClient, result.entries, AppConfig.source.filename)
-
-  return {
-    settings: JSON.parse(settingsFile),
-    source: sourceFile
-  }
+  const file = await downloadFile(boxClient, result.entries, FUNCTION_FILENAME)
+  return JSON.parse(file)
 }
 
 

@@ -15,7 +15,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     const fn = await unpackFunction(functionId as string)
-    const boxSdk = BoxSDK.getPreconfiguredInstance(fn.settings.credential.value)
+    const boxSdk = BoxSDK.getPreconfiguredInstance(fn.credential.value)
     const box = boxSdk.getAppAuthClient('enterprise')
 
     const context = {

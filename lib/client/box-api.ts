@@ -225,8 +225,15 @@ export class BoxClient {
   downloadFile(fileId) {
     return this.request({
       method: 'get',
-      url: BoxURLs.files + `/${fileId}/content`,
+      url: `${BoxURLs.files}/${fileId}/content`,
       transformResponse: res => res, // make sure it's raw
+    })
+  }
+
+  deleteFile(fileId) {
+    return this.request({
+      method: 'delete',
+      url: `${BoxURLs.files}/${fileId}`
     })
   }
 
@@ -247,6 +254,20 @@ export class BoxClient {
         role: 'viewer'
       },
       params: { fields: 'id' }
+    })
+  }
+
+  listWebhooks() {
+    return this.request({
+      method: 'get',
+      url: BoxURLs.webhooks
+    })
+  }
+
+  getWebhook(webhookId) {
+    return this.request({
+      method: 'get',
+      url: `${BoxURLs.webhooks}/${webhookId}`
     })
   }
 

@@ -1,8 +1,8 @@
-import { IBoxFunctionSettings } from "../lib/client/box-function"
+import { IBoxFunction, IBoxFunctionSettings } from "../lib/client/box-function"
 import { IBoxCredentialType, IBoxJsonWebToken } from "../lib/common/box-types"
 
 
-const JWT_TEMPLATE: IBoxJsonWebToken = {
+export const JWT_TEMPLATE: IBoxJsonWebToken = {
   "boxAppSettings": {
     "clientID": "",
     "clientSecret": "",
@@ -15,8 +15,8 @@ const JWT_TEMPLATE: IBoxJsonWebToken = {
   "enterpriseID": ""
 }
 
-const SOURCE_FILENAME: string = 'source.js'
-const SOURCE_TEMPLATE: string = `/**
+export const SOURCE_FILENAME: string = 'source.js'
+export const SOURCE_TEMPLATE: string = `/**
  * Context Variables:
  *
  * @param {object} box       Box Node SDK BoxClient instance configured using your function credentials (https://rawgit.com/box/box-node-sdk/main/docs/jsdoc/BoxClient.html) 
@@ -32,8 +32,8 @@ if (payload?.source?.id && payload?.source?.type === 'file')
   await box.comments.create(payload.source.id, "Don't look at me!")
 }`
 
-const SETTINGS_FILENAME: string = '.boxfn'
-const SETTINGS_TEMPLATE: IBoxFunctionSettings = {
+export const SETTINGS_FILENAME: string = '.boxfn'
+export const SETTINGS_TEMPLATE: IBoxFunctionSettings = {
   payload: {},
   credential: {
     type: IBoxCredentialType.JWT,
@@ -43,16 +43,14 @@ const SETTINGS_TEMPLATE: IBoxFunctionSettings = {
 }
 
 
-export default {
-  settings: {
-    filename: SETTINGS_FILENAME,
-    template: SETTINGS_TEMPLATE
-  },
-  source: {
-    filename: SOURCE_FILENAME,
-    template: SOURCE_TEMPLATE
-  },
+export const FUNCTION_FILENAME: string = 'boxfn.json'
+export const FUNCTION_TEMPLATE: IBoxFunction = {
+  name: '',
+  description: '',
+  source: SOURCE_TEMPLATE,
+  payload: {},
   credential: {
-    template: JWT_TEMPLATE
-  }
+    type: IBoxCredentialType.JWT,
+    value: null
+  },
 }

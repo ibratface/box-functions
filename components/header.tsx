@@ -1,6 +1,7 @@
-import { Box, Link } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import Head from "next/head";
-import CodeIcon from '@mui/icons-material/Code';
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 export default function Header() {
   return (
@@ -10,8 +11,8 @@ export default function Header() {
         <meta name="description" content="Box custom apps made easy" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Box sx={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'start' }}>
-        <CodeIcon fontSize="large" sx={{ m: 1 }} /><h1>{ "Box Functions" }</h1>
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', p: 2 }}>
+        <ArrowBackIosIcon/><Typography variant="h6">{"BOX FUNCTIONS"}</Typography><ArrowForwardIosIcon/>
       </Box>
     </Box>
   )

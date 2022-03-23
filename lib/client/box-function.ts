@@ -1,8 +1,10 @@
 import axios from "axios";
 import { BoxClient } from "./box-api";
 import { IBoxItemType, IBoxItem, IBoxJsonWebToken, IBoxUserToken, IBoxCredentialType } from "../common/box-types";
-import AppConfig from "../../conf/app.config"
+import { FUNCTION_FILENAME, FUNCTION_TEMPLATE } from "../../conf/app.config"
 import UserContext from "./user-context";
+import { UserSession } from "./user-session";
+import useSWR, { mutate } from "swr";
 
 
 export interface ICredential {
@@ -32,114 +34,100 @@ export interface IBoxFunctionSettings {
   triggers: ITrigger[]
 }
 
+export interface IBoxFunction {
+  name: string
+  description: string
+  source: string
+  payload: object
+  credential: ICredential
+}
 
-export class BoxFunction {
+export interface IBoxFunctionFile {
+  file: IBoxItem,
+  contents: IBoxFunction
+}
 
-  static async list() {
-    const context = UserContext.Current
-    const boxClient = new BoxClient(context)
-    const { entries: f } = await boxClient.listFolderItems(context.rootFolderID)
+
+export function useFunctionList(rootFolderId) {
+
+  async function listFunctions() {
+    const { entries: f } = await UserSession.Current.BoxClient.listFolderItems(rootFolderId)
     return f
   }
 
-  static async create(name) {
+  const { data, error } = useSWR('/function', listFunctions)
+
+  async function createFunction(name) {
     const context = UserContext.Current
     const boxClient = new BoxClient(context)
 
     const fn = await boxClient.createFolder(name, context.rootFolderID)
-    await boxClient.uploadFile(fn.id, AppConfig.source.filename, AppConfig.source.template)
-    await boxClient.uploadFile(fn.id, AppConfig.settings.filename, JSON.stringify(AppConfig.settings.template))
+    await boxClient.uploadFile(fn.id, FUNCTION_FILENAME, JSON.stringify({ ...FUNCTION_TEMPLATE, name }))
+    mutate('/function')
 
     return fn
   }
 
-  static async load(id: string): Promise<BoxFunction> {
-    const boxClient = new BoxClient(UserContext.Current)
-
-    const folder = await boxClient.getFolderInfo(id)
-    const { entries: folderItems } = await boxClient.listFolderItems(id)
-    const [sourceFile] = folderItems.filter(i => i.name == AppConfig.source.filename)
-    const [settingsFile] = folderItems.filter(i => i.name == AppConfig.settings.filename)
-
-    return new BoxFunction(folder, sourceFile, settingsFile)
+  async function deleteFunction(functionId: string) {
+    await UserSession.Current.BoxClient.deleteFolder(functionId)
+    await mutate('/function')
   }
 
-  static async delete(id: string) {
-    const fn = await BoxFunction.load(id)
-    return await fn.delete()
+  return {
+    functions: data,
+    error,
+    createFunction,
+    deleteFunction
+  }
+}
+
+export function useFunction(functionId) {
+
+  async function loadFunction() {
+    const boxClient = UserSession.Current.BoxClient
+
+    const { entries: folderItems } = await boxClient.listFolderItems(functionId)
+    const [file] = folderItems.filter(i => i.name == FUNCTION_FILENAME)
+    const fileContents = await boxClient.downloadFile(file.id)
+    const contents = JSON.parse(fileContents)
+
+    async function updateFunction(contents: IBoxFunction) {
+      const boxClient = UserSession.Current.BoxClient
+      return await boxClient.uploadFileVersion(file.id, JSON.stringify(contents))
+    }
+  
+    async function updateSource(text: string) {
+      await updateFunction({
+        ...contents,
+        source: text
+      })
+    }
+  
+    async function updatePayload(payload: object) {
+      await updateFunction({
+        ...contents,
+        payload: payload
+      })
+    }
+  
+    async function updateCredential(credential: ICredential) {
+      await updateFunction({
+        ...contents,
+        credential: credential
+      })
+    }
+  
+    async function run(payload: object): Promise<string> {
+      return axios({
+        method: 'post',
+        url: `/api/function/${functionId}/run`,
+        data: payload
+      }).then(res => res.data)
+    }
+
+    return { ...contents, updateSource, updatePayload, updateCredential, run } 
   }
 
-  private readonly folder: IBoxItem
-  private readonly sourceFile: IBoxItem
-  private readonly settingsFile: IBoxItem
-
-
-  private constructor(folder, sourceFile, settingsFile) {
-    this.folder = folder
-    this.sourceFile = sourceFile
-    this.settingsFile = settingsFile
-  }
-
-  get id(): string {
-    return this.folder.id
-  }
-
-  get name(): string {
-    return this.folder.name
-  }
-
-  getSource() {
-    const boxClient = new BoxClient(UserContext.Current)
-    return boxClient.downloadFile(this.sourceFile.id)
-  }
-
-  updateSource(text: string) {
-    const boxClient = new BoxClient(UserContext.Current)
-    return boxClient.uploadFileVersion(this.sourceFile.id, text)
-  }
-
-  async run(payload: object): Promise<string> {
-    return axios({
-      method: 'post',
-      url: `/api/function/${this.id}/run`,
-      data: payload
-    }).then(res => res.data)
-  }
-
-  async getSettings(): Promise<IBoxFunctionSettings> {
-    const boxClient = new BoxClient(UserContext.Current)
-    const settingsJson = await boxClient.downloadFile(this.settingsFile.id)
-    return JSON.parse(settingsJson)
-  }
-
-  async updateSettings(settings: IBoxFunctionSettings) {
-    const boxClient = new BoxClient(UserContext.Current)
-    return boxClient.uploadFileVersion(this.settingsFile.id, JSON.stringify(settings))
-  }
-
-  async createTrigger(config: ITriggerConfig): Promise<ITrigger> {
-    const boxClient = new BoxClient(UserContext.Current)
-    const address = `${window.location.origin}/api/function/${this.id}/run`
-    return boxClient.createWebhook({
-      address,
-      target: {
-        id: config.target.id,
-        type: config.target.type as string
-      },
-      triggers: config.events
-    })
-  }
-
-  async deleteTrigger(triggerId: string): Promise<void> {
-    const boxClient = new BoxClient(UserContext.Current)
-    return boxClient.deleteWebhook(triggerId)
-  }
-
-  async delete() {
-    const { triggers } = await this.getSettings()
-    triggers.forEach(t => this.deleteTrigger(t.id))
-
-    const boxClient = new BoxClient(UserContext.Current)
-    return await boxClient.deleteFolder(this.id)
-  }
+  const { data, error } = useSWR(`/function/${functionId}`, loadFunction)
+  return { ...data, error }
 }
