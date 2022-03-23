@@ -7,7 +7,7 @@ import { IBoxCredentialType, IBoxJsonWebToken } from "../../lib/common/box-types
 
 
 export default function FunctionCredentials({ credential, updateCredential }) {
-  const text = useRef<string>(JSON.stringify(credential?.value, null, 4) || '')
+  const text = useRef<string>(JSON.stringify(credential?.value, null, 2) || '')
   const [isSaving, setIsSaving] = useState<boolean>(false)
   const [error, setError] = useState<string>()
 

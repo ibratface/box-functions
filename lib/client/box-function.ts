@@ -27,6 +27,7 @@ export interface ITrigger extends ITriggerConfig {
 
 
 export interface IBoxFunctionSettings {
+  payload: object
   credential: ICredential
   triggers: ITrigger[]
 }
@@ -97,10 +98,11 @@ export class BoxFunction {
     return boxClient.uploadFileVersion(this.sourceFile.id, text)
   }
 
-  async run(): Promise<string> {
+  async run(payload: object): Promise<string> {
     return axios({
-      method: 'get',
+      method: 'post',
       url: `/api/function/${this.id}/run`,
+      data: payload
     }).then(res => res.data)
   }
 

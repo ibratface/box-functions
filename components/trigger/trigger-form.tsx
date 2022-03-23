@@ -1,11 +1,11 @@
 import { Alert, Box, Button, debounce, Fade, IconButton, LinearProgress, Paper, TextField, Typography } from "@mui/material";
 import { Fragment, useEffect, useState } from "react";
-import { getItemFullPath } from "../../../lib/client/box-api";
+import { getItemFullPath } from "../../lib/client/box-api";
 import TriggerEventPicker, { TriggerEventChips } from "./trigger-event-picker";
 import TriggerTargetPicker from "./trigger-target-picker";
 import CloseIcon from '@mui/icons-material/Close';
 import { LoadingButton } from "@mui/lab";
-import { UserSession } from "../../../lib/client/user-session";
+import { UserSession } from "../../lib/client/user-session";
 
 
 interface IProps {

@@ -1,8 +1,8 @@
 import { CircularProgress, FormControl, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import { debounce } from "lodash";
-import { UserSession } from "../../../lib/client/user-session";
-import { getItemFullPath } from "../../../lib/client/box-api";
+import { UserSession } from "../../lib/client/user-session";
+import { getItemFullPath } from "../../lib/client/box-api";
 
 
 export default function TriggerTargetPicker({ target: [item, setItem], isCreating }) {

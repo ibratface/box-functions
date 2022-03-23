@@ -34,6 +34,7 @@ if (payload?.source?.id && payload?.source?.type === 'file')
 
 const SETTINGS_FILENAME: string = '.boxfn'
 const SETTINGS_TEMPLATE: IBoxFunctionSettings = {
+  payload: {},
   credential: {
     type: IBoxCredentialType.JWT,
     value: null
