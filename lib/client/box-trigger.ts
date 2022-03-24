@@ -6,7 +6,12 @@ import UserContext from "./user-context"
 import { UserSession } from "./user-session"
 
 
-export function useTriggerList() {
+export function getTriggerAddress(functionId) {
+  return `${process.env.origin}/api/function/${functionId}/run`
+}
+
+
+export function useTriggerList(functionId) {
 
   async function listTriggers() {
     const { entries: w } = await new BoxClient(UserContext.Current).listWebhooks()
@@ -16,9 +21,8 @@ export function useTriggerList() {
   const { data, error } = useSWR('/triggers', listTriggers)
 
   async function createTrigger(config: ITriggerConfig): Promise<ITrigger> {
-    const boxClient = new BoxClient(UserContext.Current)
-    const address = `${window.location.origin}/api/function/${this.id}/run`
-    return boxClient.createWebhook({
+    const address = getTriggerAddress(functionId)
+    const res = await UserSession.Current.BoxClient.createWebhook({
       address,
       target: {
         id: config.target.id,
@@ -26,19 +30,21 @@ export function useTriggerList() {
       },
       triggers: config.events
     })
+    mutate('/triggers')
+    return res
   }
 
   async function deleteTrigger(triggerId: string): Promise<void> {
-    const boxClient = new BoxClient(UserContext.Current)
-    return boxClient.deleteWebhook(triggerId)
+    const res = await UserSession.Current.BoxClient.deleteWebhook(triggerId)
+    mutate('/triggers')
+    return res
   }
-
 
   return { triggers: data, error, createTrigger, deleteTrigger }
 }
 
 
-export function useTrigger(trigger: IBoxWebhook) {
+export function useTrigger(trigger: IBoxWebhook, functionId) {
 
   async function getTrigger() {
     return await UserSession.Current.BoxClient.getWebhook(trigger.id)
@@ -53,9 +59,11 @@ export function useTrigger(trigger: IBoxWebhook) {
     return target ? getItemFullPath(target) : null
   }
 
-  const { data: targetPath } = useSWR(`/trigger/target/${trigger.target.id}`, getTargetItem)
+  const { data: targetPath } = useSWR(`/trigger/${trigger.id}/target`, getTargetItem)
 
-  return {
+  const visible = !functionId || webhook?.address === getTriggerAddress(functionId)
+
+  return visible ? {
     id: trigger.id,
     address: webhook?.address,
     target: {
@@ -64,5 +72,5 @@ export function useTrigger(trigger: IBoxWebhook) {
       path: targetPath
     },
     events: webhook?.triggers
-  }
+  } : null
 } 

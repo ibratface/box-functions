@@ -1,4 +1,4 @@
-import { Backdrop, Box, Breadcrumbs, CircularProgress, Container, Link, Typography } from "@mui/material";
+import { Backdrop, Box, Breadcrumbs, CircularProgress, Link, Typography } from "@mui/material";
 import { Fragment } from "react";
 
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
@@ -24,9 +24,9 @@ export default function FunctionView({ functionId }) {
       </Backdrop>
       <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />} sx={{ p: 1 }}>
         <Link underline="hover" color="inherit" href="/">
-          <Typography variant="button">Home</Typography>
+          <Typography variant="button">FUNCTIONS</Typography>
         </Link>
-        <Typography variant="button">Function {fn.name}</Typography>
+        <Typography variant="button">{fn.name}</Typography>
       </Breadcrumbs>
       <TabView
         tabs={[
@@ -49,7 +49,7 @@ export default function FunctionView({ functionId }) {
             credential={fn.credential}
             updateCredential={fn.updateCredential}
           />,
-          <TriggerList></TriggerList>]}
+          <TriggerList functionId={functionId}></TriggerList>]}
       />
     </Fragment >)
 }
