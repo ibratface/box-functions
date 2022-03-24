@@ -1,7 +1,7 @@
 import { Box, Typography } from "@mui/material";
 import Head from "next/head";
-import Link from "next/link";
-
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 export default function Header() {
   return (
@@ -12,7 +12,7 @@ export default function Header() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', p: 2 }}>
-        <Link href="/"><Typography variant="h6" sx={{ cursor: "pointer"}}>{"BOX FUNCTIONS"}</Typography></Link>
+        <ArrowBackIosIcon/><Typography variant="h6">{"BOX FUNCTIONS"}</Typography><ArrowForwardIosIcon/>
       </Box>
     </Box>
   )

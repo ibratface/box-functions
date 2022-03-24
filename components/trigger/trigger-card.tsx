@@ -5,9 +5,9 @@ import CloseIcon from '@mui/icons-material/Close';
 import { useTrigger } from "../../lib/client/box-trigger";
 
 
-export function TriggerCard({ trigger, onDelete, functionId }) {
+export function TriggerCard({ trigger, onDelete }) {
   const [isDeleting, setIsDeleting] = useState<boolean>(false)
-  const triggerFull = useTrigger(trigger, functionId)
+  const triggerFull = useTrigger(trigger)
 
   const onClickDelete = debounce(async () => {
     setIsDeleting(true)
@@ -15,22 +15,20 @@ export function TriggerCard({ trigger, onDelete, functionId }) {
     setIsDeleting(false)
   }, 350)
 
-  return triggerFull ? (
-    <Paper sx={{ display: 'flex', flexDirection: 'column', gap: 1, p: 2 }}>
+  return (
+    <Paper component="form" sx={{ display: 'flex', flexDirection: 'column', gap: 1, p: 2 }}>
       {
-        isDeleting || !trigger ? <LinearProgress></LinearProgress> :
+        isDeleting || !triggerFull ? <LinearProgress></LinearProgress> :
           <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', width: '100%' }}>
-            <Box sx={{ flexGrow: 1 }}>
-              <Typography variant="caption">EXECUTE ON</Typography>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, width: 'auto' }}>
+              <Typography variant="caption">EXECUTE WHEN</Typography>
               <TriggerEventChips events={triggerFull?.events} />
-            </Box>
-            <Box sx={{ flexGrow: 1 }}>
-              <Typography variant="caption">AT</Typography>
-              <Typography variant="body2" sx={{ pt: 1, pb: 1 }}>{triggerFull.target.path || 'loading'}</Typography>
+              <Typography variant="caption" sx={{ mt: 1 }}>AT</Typography>
+              <Typography variant="body2">{triggerFull.target.path || 'loading'}</Typography>
             </Box>
             <IconButton size="small" onClick={onClickDelete}><CloseIcon fontSize="inherit" /></IconButton>
           </Box>
       }
     </Paper>
-  ) : null
+  )
 }

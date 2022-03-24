@@ -68,7 +68,7 @@ const TRIGGER_EVENTS = {
 }
 
 export function TriggerEventChips({ events }) {
-  return <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, pt: 1 }}>
+  return <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
     {events?.map((e) => (
       <Chip key={e} label={e} />
     ))}

@@ -82,7 +82,6 @@ export function useFunctionList(rootFolderId) {
 }
 
 export function useFunction(functionId) {
-  const uri = `/function/${functionId}`
 
   async function loadFunction() {
     const boxClient = UserSession.Current.BoxClient
@@ -94,8 +93,7 @@ export function useFunction(functionId) {
 
     async function updateFunction(contents: IBoxFunction) {
       const boxClient = UserSession.Current.BoxClient
-      const res = await boxClient.uploadFileVersion(file.id, JSON.stringify(contents))
-      mutate(uri)
+      return await boxClient.uploadFileVersion(file.id, JSON.stringify(contents))
     }
   
     async function updateSource(text: string) {
@@ -119,17 +117,17 @@ export function useFunction(functionId) {
       })
     }
   
-    async function run(): Promise<string> {
+    async function run(payload: object): Promise<string> {
       return axios({
         method: 'post',
         url: `/api/function/${functionId}/run`,
-        data: contents.payload
+        data: payload
       }).then(res => res.data)
     }
 
     return { ...contents, updateSource, updatePayload, updateCredential, run } 
   }
 
-  const { data, error } = useSWR(uri, loadFunction)
+  const { data, error } = useSWR(`/function/${functionId}`, loadFunction)
   return { ...data, error }
 }
