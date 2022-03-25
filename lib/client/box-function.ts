@@ -1,10 +1,11 @@
 import axios from "axios";
 import { BoxClient } from "./box-api";
-import { IBoxItemType, IBoxItem, IBoxJsonWebToken, IBoxUserToken, IBoxCredentialType } from "../common/box-types";
+import { IBoxItemType, IBoxItem, IBoxJsonWebToken, IBoxUserToken, IBoxCredentialType, IBoxWebhook } from "../common/box-types";
 import { FUNCTION_FILENAME, FUNCTION_TEMPLATE } from "../../conf/app.config"
 import UserContext from "./user-context";
 import { UserSession } from "./user-session";
 import useSWR, { mutate } from "swr";
+import TriggerList from "../../components/trigger/trigger-list";
 
 
 export interface ICredential {
@@ -34,13 +35,16 @@ export interface IBoxFunctionSettings {
   triggers: ITrigger[]
 }
 
+
 export interface IBoxFunction {
   name: string
   description: string
   source: string
   payload: object
   credential: ICredential
+  triggers: IBoxWebhook[]
 }
+
 
 export interface IBoxFunctionFile {
   file: IBoxItem,
@@ -81,7 +85,14 @@ export function useFunctionList(rootFolderId) {
   }
 }
 
+
+export function getTriggerAddress(functionId) {
+  return `${process.env.origin}/api/function/${functionId}/run`
+}
+
+
 export function useFunction(functionId) {
+  const uri = `/function/${functionId}`
 
   async function loadFunction() {
     const boxClient = UserSession.Current.BoxClient
@@ -93,41 +104,69 @@ export function useFunction(functionId) {
 
     async function updateFunction(contents: IBoxFunction) {
       const boxClient = UserSession.Current.BoxClient
-      return await boxClient.uploadFileVersion(file.id, JSON.stringify(contents))
+      const res = await boxClient.uploadFileVersion(file.id, JSON.stringify(contents))
+      mutate(uri)
+      return res
     }
-  
+
     async function updateSource(text: string) {
       await updateFunction({
         ...contents,
         source: text
       })
     }
-  
+
     async function updatePayload(payload: object) {
       await updateFunction({
         ...contents,
         payload: payload
       })
     }
-  
+
     async function updateCredential(credential: ICredential) {
       await updateFunction({
         ...contents,
         credential: credential
       })
     }
-  
-    async function run(payload: object): Promise<string> {
+
+    async function run(): Promise<string> {
       return axios({
         method: 'post',
         url: `/api/function/${functionId}/run`,
-        data: payload
+        data: contents.payload
       }).then(res => res.data)
     }
 
-    return { ...contents, updateSource, updatePayload, updateCredential, run } 
+    async function createTrigger(config: ITriggerConfig): Promise<ITrigger> {
+      const address = getTriggerAddress(functionId)
+      const res = await UserSession.Current.BoxClient.createWebhook({
+        address,
+        target: {
+          id: config.target.id,
+          type: config.target.type as string
+        },
+        triggers: config.events
+      })
+      await updateFunction({
+        ...contents,
+        triggers: [...contents.triggers, res]
+      })
+      return res
+    }
+
+    async function deleteTrigger(triggerId: string): Promise<void> {
+      const res = await UserSession.Current.BoxClient.deleteWebhook(triggerId)
+      await updateFunction({
+        ...contents,
+        triggers: contents.triggers.filter(t => t.id !== triggerId)
+      })
+      return res
+    }
+
+    return { ...contents, updateSource, updatePayload, updateCredential, run, createTrigger, deleteTrigger }
   }
 
-  const { data, error } = useSWR(`/function/${functionId}`, loadFunction)
+  const { data, error } = useSWR(uri, loadFunction)
   return { ...data, error }
 }

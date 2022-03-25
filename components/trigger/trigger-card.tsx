@@ -16,15 +16,17 @@ export function TriggerCard({ trigger, onDelete }) {
   }, 350)
 
   return (
-    <Paper component="form" sx={{ display: 'flex', flexDirection: 'column', gap: 1, p: 2 }}>
+    <Paper component="form" sx={{ display: 'flex', flexDirection: 'column', p: 1 }}>
       {
         isDeleting || !triggerFull ? <LinearProgress></LinearProgress> :
           <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', width: '100%' }}>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, width: 'auto' }}>
+            <Box sx={{ flexGrow: 1, p: 1 }}>
               <Typography variant="caption">EXECUTE WHEN</Typography>
               <TriggerEventChips events={triggerFull?.events} />
-              <Typography variant="caption" sx={{ mt: 1 }}>AT</Typography>
-              <Typography variant="body2">{triggerFull.target.path || 'loading'}</Typography>
+            </Box>
+            <Box sx={{ flexGrow: 1, p: 1 }}>
+              <Typography variant="caption">AT</Typography>
+              <Typography variant="body2" sx={{ pt: 1 }}>{triggerFull.target.path || 'loading'}</Typography>
             </Box>
             <IconButton size="small" onClick={onClickDelete}><CloseIcon fontSize="inherit" /></IconButton>
           </Box>

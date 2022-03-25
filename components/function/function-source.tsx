@@ -52,7 +52,6 @@ function FunctionOutput({ output, isRunning }) {
 
 
 export default function FunctionSource({ run, source, updateSource, payload, updatePayload }) {
-  const payloadText = useRef<string>(JSON.stringify(payload, null, 2) || '')
   const [output, setOutput] = useState<string>()
   const [isRunning, setIsRunning] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
@@ -108,7 +107,7 @@ export default function FunctionSource({ run, source, updateSource, payload, upd
         </Box>
         <Box sx={{ flexGrow: 1 }}>
           <CodeMirror
-            value={payloadText.current}
+            value={payload}
             height="440px"
             extensions={[json()]}
             placeholder={`// Payload`}

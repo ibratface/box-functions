@@ -6,7 +6,12 @@ import UserContext from "./user-context"
 import { UserSession } from "./user-session"
 
 
-export function useTriggerList() {
+export function getTriggerAddress(functionId) {
+  return `${process.env.origin}/api/function/${functionId}/run`
+}
+
+
+export function useTriggerList(functionId) {
 
   async function listTriggers() {
     const { entries: w } = await new BoxClient(UserContext.Current).listWebhooks()
@@ -16,9 +21,8 @@ export function useTriggerList() {
   const { data, error } = useSWR('/triggers', listTriggers)
 
   async function createTrigger(config: ITriggerConfig): Promise<ITrigger> {
-    const boxClient = new BoxClient(UserContext.Current)
-    const address = `${window.location.origin}/api/function/${this.id}/run`
-    return boxClient.createWebhook({
+    const address = getTriggerAddress(functionId)
+    const res = await UserSession.Current.BoxClient.createWebhook({
       address,
       target: {
         id: config.target.id,
@@ -26,11 +30,14 @@ export function useTriggerList() {
       },
       triggers: config.events
     })
+    await mutate('/triggers')
+    return res
   }
 
   async function deleteTrigger(triggerId: string): Promise<void> {
-    const boxClient = new BoxClient(UserContext.Current)
-    return boxClient.deleteWebhook(triggerId)
+    const res = await UserSession.Current.BoxClient.deleteWebhook(triggerId)
+    await mutate('/triggers')
+    return res
   }
 
 
@@ -39,12 +46,6 @@ export function useTriggerList() {
 
 
 export function useTrigger(trigger: IBoxWebhook) {
-
-  async function getTrigger() {
-    return await UserSession.Current.BoxClient.getWebhook(trigger.id)
-  }
-
-  const { data: webhook } = useSWR(`/trigger/${trigger.id}`, getTrigger)
 
   async function getTargetItem() {
     let target = null;
@@ -57,12 +58,12 @@ export function useTrigger(trigger: IBoxWebhook) {
 
   return {
     id: trigger.id,
-    address: webhook?.address,
+    address: trigger.address,
     target: {
       id: trigger.target.id,
       type: trigger.target.type,
       path: targetPath
     },
-    events: webhook?.triggers
+    events: trigger.triggers
   }
 } 

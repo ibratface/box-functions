@@ -53,4 +53,5 @@ export const FUNCTION_TEMPLATE: IBoxFunction = {
     type: IBoxCredentialType.JWT,
     value: null
   },
+  triggers: []
 }

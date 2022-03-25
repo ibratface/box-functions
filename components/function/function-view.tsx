@@ -1,4 +1,4 @@
-import { Backdrop, Box, Breadcrumbs, CircularProgress, Container, Link, Typography } from "@mui/material";
+import { Backdrop, Box, Breadcrumbs, CircularProgress, Link, Typography } from "@mui/material";
 import { Fragment } from "react";
 
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
@@ -24,13 +24,13 @@ export default function FunctionView({ functionId }) {
       </Backdrop>
       <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />} sx={{ p: 1 }}>
         <Link underline="hover" color="inherit" href="/">
-          <Typography variant="button">Home</Typography>
+          <Typography variant="button">Function</Typography>
         </Link>
-        <Typography variant="button">Function {fn.name}</Typography>
+        <Typography variant="button">{fn.name}</Typography>
       </Breadcrumbs>
       <TabView
         tabs={[
-          'Function',
+          'Source',
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }} key='credentials'>
             <Typography variant='body2'> Credentials </Typography>
             {fn.credential?.value ? null : <ErrorOutlineIcon color="error" />}
@@ -42,14 +42,18 @@ export default function FunctionView({ functionId }) {
             run={fn.run}
             source={fn.source}
             updateSource={fn.updateSource}
-            payload={fn.payload}
+            payload={JSON.stringify(fn.payload, null, 2)}
             updatePayload={fn.updatePayload}
           />,
           <FunctionCredentials key="credentials"
-            credential={fn.credential}
+            credential={fn.credential?.value ? JSON.stringify(fn.credential?.value, null, 2) : ''}
             updateCredential={fn.updateCredential}
           />,
-          <TriggerList></TriggerList>]}
+          <TriggerList key="trigers"
+            triggers={fn.triggers}
+            createTrigger={fn.createTrigger}
+            deleteTrigger={fn.deleteTrigger}
+          />]}
       />
     </Fragment >)
 }
