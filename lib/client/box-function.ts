@@ -105,7 +105,7 @@ export function useFunction(functionId) {
     async function updateFunction(contents: IBoxFunction) {
       const boxClient = UserSession.Current.BoxClient
       const res = await boxClient.uploadFileVersion(file.id, JSON.stringify(contents))
-      mutate(uri)
+      await mutate(uri)
       return res
     }
 
@@ -135,7 +135,14 @@ export function useFunction(functionId) {
         method: 'post',
         url: `/api/function/${functionId}/run`,
         data: contents.payload
-      }).then(res => res.data)
+      }).then(res => res.data).catch(e => {
+        if (e.response) {
+          throw e.response.data
+        }
+        else {
+          throw e
+        }
+      })
     }
 
     async function createTrigger(config: ITriggerConfig): Promise<ITrigger> {

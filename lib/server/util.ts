@@ -75,3 +75,14 @@ export function getHttpResponseConsole(res) {
 
   return new Console(httpStream, httpStream, false)
 }
+
+export function getStringBufferConsole(res, buffer) {
+  buffer.value = ''
+  const httpStream = new stream.Writable();
+  httpStream._write = function (chunk, encoding, done) {
+    buffer.value += chunk 
+    done();
+  };
+
+  return new Console(httpStream, httpStream, false)
+}

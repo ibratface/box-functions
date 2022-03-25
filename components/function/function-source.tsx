@@ -64,7 +64,7 @@ export default function FunctionSource({ run, source, updateSource, payload, upd
       setOutput(res)
     }
     catch (e) {
-      setOutput(e.message)
+      setOutput(e)
     }
     setIsRunning(false)
   }

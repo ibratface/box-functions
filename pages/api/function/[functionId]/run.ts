@@ -1,5 +1,5 @@
 import BoxSDK from "box-node-sdk"
-import { getHttpResponseConsole, unpackFunction } from "../../../../lib/server/util"
+import { getHttpResponseConsole, getStringBufferConsole, unpackFunction } from "../../../../lib/server/util"
 import vm from 'vm'
 import { NextApiRequest, NextApiResponse } from "next";
 
@@ -17,14 +17,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const fn = await unpackFunction(functionId as string)
     const boxSdk = BoxSDK.getPreconfiguredInstance(fn.credential.value)
     const box = boxSdk.getAppAuthClient('enterprise')
-
+    const buffer = { value: '' }
     const context = {
       box,
       payload: req.body,
-      console: getHttpResponseConsole(res)
+      console: getStringBufferConsole(res, buffer)
     }
     const func = vm.runInNewContext(`async function _execute() { 'use strict'; ${fn.source} }; _execute;`, context, { timeout: 1000 })
     await func(context)
+    res.write(buffer.value)
     res.status(200).end()
   }
   catch (e) {
