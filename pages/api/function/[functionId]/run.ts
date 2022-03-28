@@ -1,5 +1,5 @@
 import BoxSDK from "box-node-sdk"
-import { getHttpResponseConsole, getStringBufferConsole, unpackFunction } from "../../../../lib/server/util"
+import { getBufferConsole, logOutput, unpackFunction, getBoxClientServiceAccount } from "../../../../lib/server/util"
 import vm from 'vm'
 import { NextApiRequest, NextApiResponse } from "next";
 
@@ -14,19 +14,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const { functionId } = req.query
 
   try {
-    const fn = await unpackFunction(functionId as string)
+    const boxClient = getBoxClientServiceAccount()
+    const fn = await unpackFunction(boxClient, functionId as string)
     const boxSdk = BoxSDK.getPreconfiguredInstance(fn.credential.value)
     const box = boxSdk.getAppAuthClient('enterprise')
-    const buffer = { value: '' }
+    const [ console, chunks ] = getBufferConsole()
     const context = {
       box,
       payload: req.body,
-      console: getStringBufferConsole(res, buffer)
+      console
     }
     const func = vm.runInNewContext(`async function _execute() { 'use strict'; ${fn.source} }; _execute;`, context, { timeout: 1000 })
     await func(context)
-    res.write(buffer.value)
+    const log = Buffer.concat(chunks as Buffer[])
+    res.write(log)
     res.status(200).end()
+    logOutput(boxClient, functionId as string, log)
   }
   catch (e) {
     console.error(e)

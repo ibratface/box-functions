@@ -1,11 +1,10 @@
 import axios from "axios";
 import { BoxClient } from "./box-api";
 import { IBoxItemType, IBoxItem, IBoxJsonWebToken, IBoxUserToken, IBoxCredentialType, IBoxWebhook } from "../common/box-types";
-import { FUNCTION_FILENAME, FUNCTION_TEMPLATE } from "../../conf/app.config"
+import { FUNCTION_FILENAME, FUNCTION_LOGDIRNAME, FUNCTION_TEMPLATE } from "../../conf/app.config"
 import UserContext from "./user-context";
 import { UserSession } from "./user-session";
 import useSWR, { mutate } from "swr";
-import TriggerList from "../../components/trigger/trigger-list";
 
 
 export interface ICredential {
@@ -66,6 +65,7 @@ export function useFunctionList(rootFolderId) {
     const boxClient = new BoxClient(context)
 
     const fn = await boxClient.createFolder(name, context.rootFolderID)
+    await boxClient.createFolder(FUNCTION_LOGDIRNAME, fn.id)
     await boxClient.uploadFile(fn.id, FUNCTION_FILENAME, JSON.stringify({ ...FUNCTION_TEMPLATE, name }))
     mutate('/function')
 
@@ -99,6 +99,7 @@ export function useFunction(functionId) {
 
     const { entries: folderItems } = await boxClient.listFolderItems(functionId)
     const [file] = folderItems.filter(i => i.name == FUNCTION_FILENAME)
+    const [logFolder] = folderItems.filter(i => i.name == FUNCTION_LOGDIRNAME)
     const fileContents = await boxClient.downloadFile(file.id)
     const contents = JSON.parse(fileContents)
 
@@ -171,7 +172,7 @@ export function useFunction(functionId) {
       return res
     }
 
-    return { ...contents, updateSource, updatePayload, updateCredential, run, createTrigger, deleteTrigger }
+    return { ...contents, updateSource, updatePayload, updateCredential, run, createTrigger, deleteTrigger, logFolder }
   }
 
   const { data, error } = useSWR(uri, loadFunction)

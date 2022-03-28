@@ -55,3 +55,7 @@ export const FUNCTION_TEMPLATE: IBoxFunction = {
   },
   triggers: []
 }
+
+
+export const FUNCTION_LOGDIRNAME: string = 'logs'
+export const FUNCTION_LOGBUFSIZE: number = 1024 * 10

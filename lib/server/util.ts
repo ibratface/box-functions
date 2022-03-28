@@ -3,7 +3,8 @@ import boxConfig from '../../conf/box.config'
 import stream from 'stream';
 import { Console } from 'console';
 import { NextApiRequest } from 'next';
-import { FUNCTION_FILENAME } from '../../conf/app.config';
+import { FUNCTION_FILENAME, FUNCTION_LOGBUFSIZE, FUNCTION_LOGDIRNAME } from '../../conf/app.config';
+import BoxClient from 'box-node-sdk/lib/box-client';
 
 
 export function getBoxClientUser(token) {
@@ -15,7 +16,7 @@ export function getBoxClientUser(token) {
 }
 
 
-export function getBoxClientServiceAccount() {
+export function getBoxClientServiceAccount(): BoxClient {
   const sdk = BoxSDK.getPreconfiguredInstance(boxConfig.backend)
   const client = sdk.getAppAuthClient('enterprise')
   return client
@@ -45,11 +46,34 @@ async function downloadFile(boxClient, items, filename): Promise<string> {
 }
 
 
-export async function unpackFunction(functionId: string) {
-  const boxClient = getBoxClientServiceAccount()
+export async function unpackFunction(boxClient: BoxClient, functionId: string) {
   const result = await boxClient.folders.getItems(functionId, { fields: 'id,name' })
   const file = await downloadFile(boxClient, result.entries, FUNCTION_FILENAME)
   return JSON.parse(file)
+}
+
+
+export function timestamp() {
+  return new Date().getTime()
+}
+
+
+export async function logOutput(boxClient: BoxClient, functionId: string, logBuffer: Buffer) {
+  let logFolderId = null
+  try {
+    const logFolder = await boxClient.folders.create(functionId, FUNCTION_LOGDIRNAME)
+    logFolderId = logFolder.id
+  }
+  catch (e) {
+    const body = e.response.body
+    if (body.status == 409 && body.code === 'item_name_in_use') {
+      logFolderId = body.context_info.conflicts[0].id
+    }
+  } finally {
+    if (logFolderId) {
+      boxClient.files.uploadFile(logFolderId, `${timestamp().toString()}.log`, logBuffer)
+    }
+  }
 }
 
 
@@ -76,13 +100,13 @@ export function getHttpResponseConsole(res) {
   return new Console(httpStream, httpStream, false)
 }
 
-export function getStringBufferConsole(res, buffer) {
-  buffer.value = ''
-  const httpStream = new stream.Writable();
-  httpStream._write = function (chunk, encoding, done) {
-    buffer.value += chunk 
+export function getBufferConsole() {
+  const chunks = []
+  const bufStream = new stream.Writable();
+  bufStream._write = function (chunk, encoding, done) {
+    chunks.push(Buffer.from(chunk))
     done();
   };
 
-  return new Console(httpStream, httpStream, false)
+  return [new Console(bufStream, bufStream, false), chunks]
 }

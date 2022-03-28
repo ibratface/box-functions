@@ -251,7 +251,7 @@ export class BoxClient {
           id: folderId,
           type: 'folder'
         },
-        role: 'viewer'
+        role: 'viewer uploader'
       },
       params: { fields: 'id' }
     })
