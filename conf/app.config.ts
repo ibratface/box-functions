@@ -48,7 +48,7 @@ export const FUNCTION_TEMPLATE: IBoxFunction = {
   name: '',
   description: '',
   source: SOURCE_TEMPLATE,
-  payload: {},
+  payload: '',
   credential: {
     type: IBoxCredentialType.JWT,
     value: null

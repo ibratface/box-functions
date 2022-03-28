@@ -70,7 +70,7 @@ export default function FunctionSource({ run, source, updateSource, payload, upd
   }
 
   const onChangeSource = debounce(async (value, viewUpdate) => {
-    if (source && source !== value) {
+    if (source != null && source !== value) {
       setIsSaving(true)
       await updateSource(value)
       setIsSaving(false)
@@ -78,12 +78,12 @@ export default function FunctionSource({ run, source, updateSource, payload, upd
   }, 1200)
 
   const onChangePayload = debounce(async (value, viewUpdate) => {
-    if (payload && payload !== value) {
+    if (payload != null && payload !== value) {
       setIsSaving(true)
       try {
-        setError(null)        
-        const jsonValue: object = JSON.parse(value)
-        await updatePayload(jsonValue)
+        setError(null)
+        JSON.parse(value)
+        await updatePayload(value)
       } catch (e) {
         setError(e.message)
       }

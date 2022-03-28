@@ -42,7 +42,7 @@ export default function FunctionView({ functionId }) {
             run={fn.run}
             source={fn.source}
             updateSource={fn.updateSource}
-            payload={JSON.stringify(fn.payload, null, 2)}
+            payload={fn.payload}
             updatePayload={fn.updatePayload}
           />,
           <FunctionCredentials key="credentials"
