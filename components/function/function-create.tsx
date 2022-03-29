@@ -2,18 +2,21 @@ import { Alert, Stack, TextField } from '@mui/material';
 import { useRef, useState } from 'react';
 import LoadingButton from '@mui/lab/LoadingButton';
 import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
+import { useRouter } from 'next/router';
 
 
 export default function FunctionCreate({ onCreate }) {
   const [creating, setCreating] = useState<boolean>(false)
   const [error, setError] = useState<string>()
   const functionNameField = useRef<HTMLInputElement>();
+  const router = useRouter()
 
   const onClickCreate = async (e) => {
     setCreating(true)
     try {
-      await onCreate(functionNameField.current.value)
+      const fn = await onCreate(functionNameField.current.value)
       setError(null)
+      router.push(`/function/${fn.id}`)
     }
     catch (e)
     {

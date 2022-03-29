@@ -6,6 +6,7 @@ import UserContext from "./user-context";
 import { UserSession } from "./user-session";
 import useSWR, { useSWRConfig } from "swr";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 
 
 export interface ICredential {
@@ -74,16 +75,10 @@ export function useFunctionList(rootFolderId) {
     return fn
   }
 
-  async function deleteFunction(functionId: string) {
-    await UserSession.Current.BoxClient.deleteFolder(functionId)
-    await mutate('/function')
-  }
-
   return {
     functions: data,
     error,
     createFunction,
-    deleteFunction
   }
 }
 
@@ -94,6 +89,7 @@ export function getTriggerAddress(functionId) {
 
 
 export function useFunction(functionId) {
+
   const uri = `/function/${functionId}`
 
   async function loadItems() {
@@ -186,6 +182,13 @@ export function useFunction(functionId) {
     return res
   }
 
+  async function deleteFunction() {
+    const boxClient = UserSession.Current.BoxClient
+    await fn?.triggers?.forEach(async t => {
+      await boxClient.deleteWebhook(t.id)
+    })
+    await boxClient.deleteFolder(functionId)
+  }
 
-  return { ...fn, updateSource, updatePayload, updateCredential, run, createTrigger, deleteTrigger, logFolder: items?.logFolder }
+  return { ...fn, updateSource, updatePayload, updateCredential, run, createTrigger, deleteTrigger, logFolder: items?.logFolder, deleteFunction }
 }

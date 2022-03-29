@@ -9,6 +9,7 @@ import FunctionSource from "../../components/function/function-source";
 import TabView from "../../components/tab-view";
 import { useFunction } from "../../lib/client/box-function";
 import TriggerList from "../trigger/trigger-list";
+import FunctionSettings from "./function-settings";
 
 
 export default function FunctionView({ functionId }) {
@@ -35,7 +36,8 @@ export default function FunctionView({ functionId }) {
             <Typography variant='body2'> Credentials </Typography>
             {fn.credential?.value ? null : <ErrorOutlineIcon color="error" />}
           </Box>,
-          'Triggers'
+          'Triggers',
+          'Settings'
         ]}
         panels={[
           <FunctionSource key="code"
@@ -53,6 +55,9 @@ export default function FunctionView({ functionId }) {
             triggers={fn.triggers}
             createTrigger={fn.createTrigger}
             deleteTrigger={fn.deleteTrigger}
+          />,
+          <FunctionSettings key="settings"
+            deleteFunction={fn.deleteFunction}
           />]}
       />
     </Fragment >)
