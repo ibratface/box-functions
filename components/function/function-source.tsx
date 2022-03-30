@@ -1,11 +1,12 @@
 import { javascript } from "@codemirror/lang-javascript";
 import { json } from "@codemirror/lang-json";
-import { Alert, Box, Skeleton, Typography } from "@mui/material";
+import { Alert, Box, Link, Skeleton, Typography } from "@mui/material";
 import { Fragment, useRef, useState } from "react";
 import CodeMirror from "@uiw/react-codemirror";
 import { debounce } from "lodash";
 import PlayCircleIcon from '@mui/icons-material/PlayCircle';
 import { LoadingButton } from "@mui/lab";
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 
 
 function FunctionBar({ error, isSaving, isRunning, onRun }) {
@@ -29,11 +30,19 @@ function FunctionBar({ error, isSaving, isRunning, onRun }) {
 }
 
 
-function FunctionOutput({ output, isRunning }) {
+function FunctionOutput({ output, isRunning, logFolder }) {
   return (
     <Box sx={{ textAlign: 'left', p: 1 }}>
       <Typography variant="button">OUTPUT</Typography>
-      {/* <Divider sx={{ mb: 1 }} /> */}
+      <Link href={`https://app.box.com/folder/${logFolder?.id}`}
+        target="_blank"
+        rel="noreferer"
+        variant="body2"
+        underline="hover"
+        sx={{ ml: 6 }}
+      >
+        RUN HISTORY <OpenInNewIcon fontSize="inherit" />
+      </Link>
       <Box sx={{ whiteSpace: "pre-line", marginTop: 1, color: 'text.secondary' }}>
         {isRunning ? <Skeleton /> : null}
         {typeof output === 'string' && !isRunning ?
@@ -51,7 +60,7 @@ function FunctionOutput({ output, isRunning }) {
 }
 
 
-export default function FunctionSource({ run, source, updateSource, payload, updatePayload }) {
+export default function FunctionSource({ run, source, updateSource, payload, updatePayload, logFolder }) {
   const [output, setOutput] = useState<string>()
   const [isRunning, setIsRunning] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
@@ -116,7 +125,7 @@ export default function FunctionSource({ run, source, updateSource, payload, upd
           />
         </Box>
       </Box>
-      <FunctionOutput output={output} isRunning={isRunning} />
+      <FunctionOutput output={output} isRunning={isRunning} logFolder={logFolder} />
     </Fragment>
   )
 }

@@ -46,6 +46,7 @@ export default function FunctionView({ functionId }) {
             updateSource={fn.updateSource}
             payload={fn.payload}
             updatePayload={fn.updatePayload}
+            logFolder={fn.logFolder}
           />,
           <FunctionCredentials key="credentials"
             credential={fn.credential?.value ? JSON.stringify(fn.credential?.value, null, 2) : ''}

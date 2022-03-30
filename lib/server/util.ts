@@ -69,6 +69,9 @@ export async function logOutput(boxClient: BoxClient, functionId: string, logBuf
     if (body.status == 409 && body.code === 'item_name_in_use') {
       logFolderId = body.context_info.conflicts[0].id
     }
+    else {
+      console.error(e)
+    }
   } finally {
     if (logFolderId) {
       boxClient.files.uploadFile(logFolderId, `${timestamp().toString()}.log`, logBuffer)
